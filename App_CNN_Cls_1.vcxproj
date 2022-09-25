@@ -116,7 +116,7 @@
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_NONSTDC_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>C:\Lib_3rd_Party\opencv_3416_vc14_vc15\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -134,7 +134,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_NONSTDC_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>C:\Lib_3rd_Party\opencv_3416_vc14_vc15\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -150,6 +150,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App_CNN_Cls_1.cpp" />
+    <ClCompile Include="CNNCls.cpp" />
+    <ClCompile Include="CNNDataset.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CNNCls.h" />
+    <ClInclude Include="CNNDataset.h" />
+    <ClInclude Include="CNNDataStruct.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

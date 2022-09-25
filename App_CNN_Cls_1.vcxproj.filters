@@ -13,10 +13,33 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\algorithms">
+      <UniqueIdentifier>{a1c6143c-462f-4a5e-bad2-a483c12abb6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\algorithms">
+      <UniqueIdentifier>{d903c67f-8113-4ad9-be17-7281be6e53c6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App_CNN_Cls_1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CNNCls.cpp">
+      <Filter>Source Files\algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="CNNDataset.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CNNCls.h">
+      <Filter>Header Files\algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="CNNDataset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CNNDataStruct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
