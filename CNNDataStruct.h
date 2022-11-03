@@ -14,6 +14,7 @@ public:
 		this->y = 0;
 	}
 	~RectSize() {};
+
 	RectSize(int x, int y)
 	{
 		this->x = x;

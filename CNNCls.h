@@ -24,7 +24,6 @@ Description:
 
 using namespace std;
 using namespace cv;
-
 // Utility
 double cpu_time();
 void randomMatrix(int x, int y, double** outmatrix);
@@ -49,7 +48,6 @@ void ArrayMultiply(double** matrix, double val, int m, int n);// array multiply 
 void setValue(double** maps, double** sum, int m, int n);
 int findIndex(double*** p);
 int findIndex(double* p);
-
 
 // Layer
 

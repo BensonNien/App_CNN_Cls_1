@@ -150,13 +150,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App_CNN_Cls_1.cpp" />
-    <ClCompile Include="CNNCls.cpp" />
     <ClCompile Include="CNNDataset.cpp" />
+    <ClCompile Include="CPUCNNCls.cpp" />
+    <ClCompile Include="CPUCNNLayer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CNNCls.h" />
     <ClInclude Include="CNNDataset.h" />
     <ClInclude Include="CNNDataStruct.h" />
+    <ClInclude Include="CPUCNNCls.h" />
+    <ClInclude Include="CPUCNNLayer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

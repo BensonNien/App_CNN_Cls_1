@@ -24,22 +24,28 @@
     <ClCompile Include="App_CNN_Cls_1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CNNCls.cpp">
-      <Filter>Source Files\algorithms</Filter>
-    </ClCompile>
     <ClCompile Include="CNNDataset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CPUCNNCls.cpp">
+      <Filter>Source Files\algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="CPUCNNLayer.cpp">
+      <Filter>Source Files\algorithms</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CNNCls.h">
-      <Filter>Header Files\algorithms</Filter>
-    </ClInclude>
     <ClInclude Include="CNNDataset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CNNDataStruct.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPUCNNCls.h">
+      <Filter>Header Files\algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="CPUCNNLayer.h">
+      <Filter>Header Files\algorithms</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

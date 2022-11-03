@@ -1,6 +1,6 @@
 #include "CNNDataset.h"
 
-void CNNDataset::Load(double**** train_x, double**** test_x, double** train_label, double** test_label)
+void CNNDataset::Load(float**** train_x, float**** test_x, float** train_label, float** test_label)
 {
 
 	//read image by opencv
@@ -43,7 +43,7 @@ void CNNDataset::Load(double**** train_x, double**** test_x, double** train_labe
 					for (int indexOfPositiveCloning = 0; indexOfPositiveCloning < (2 * numOfPositiveCloning); indexOfPositiveCloning += 2)
 					{
 
-						train_x[((2 * numOfPositiveCloning) * k + 1) + indexOfPositiveCloning][c][i][j] = test_x[((2 * numOfPositiveCloning) * k + 1) + indexOfPositiveCloning][c][i][j] = (double)(input_posimg1.at<Vec3b>(i, j)[c]) / 255.0;
+						train_x[((2 * numOfPositiveCloning) * k + 1) + indexOfPositiveCloning][c][i][j] = test_x[((2 * numOfPositiveCloning) * k + 1) + indexOfPositiveCloning][c][i][j] = (float)(input_posimg1.at<Vec3b>(i, j)[c]) / 255.0;
 						train_label[((2 * numOfPositiveCloning) * k + 1) + indexOfPositiveCloning][0] = test_label[((2 * numOfPositiveCloning) * k + 1) + indexOfPositiveCloning][0] = 0.0;
 						train_label[((2 * numOfPositiveCloning) * k + 1) + indexOfPositiveCloning][1] = test_label[((2 * numOfPositiveCloning) * k + 1) + indexOfPositiveCloning][1] = 1.0;
 
@@ -76,7 +76,7 @@ void CNNDataset::Load(double**** train_x, double**** test_x, double** train_labe
 					for (int indexOfNegativeCloning = 0; indexOfNegativeCloning < (2 * numOfNegativeCloning); indexOfNegativeCloning += 2)
 					{
 
-						train_x[((2 * numOfNegativeCloning) * k) + indexOfNegativeCloning][c][i][j] = test_x[((2 * numOfNegativeCloning) * k) + indexOfNegativeCloning][c][i][j] = (double)(input_negimg1.at<Vec3b>(i, j)[c]) / 255.0;
+						train_x[((2 * numOfNegativeCloning) * k) + indexOfNegativeCloning][c][i][j] = test_x[((2 * numOfNegativeCloning) * k) + indexOfNegativeCloning][c][i][j] = (float)(input_negimg1.at<Vec3b>(i, j)[c]) / 255.0;
 						train_label[((2 * numOfNegativeCloning) * k) + indexOfNegativeCloning][0] = test_label[((2 * numOfNegativeCloning) * k) + indexOfNegativeCloning][0] = 1.0;
 						train_label[((2 * numOfNegativeCloning) * k) + indexOfNegativeCloning][1] = test_label[((2 * numOfNegativeCloning) * k) + indexOfNegativeCloning][1] = 0.0;
 

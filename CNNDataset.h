@@ -17,5 +17,5 @@ public:
 	~CNNDataset() {};
 
 	// Static Member Funcs
-	static void Load(double**** train_x, double**** test_x, double** train_label, double** test_label);
+	static void Load(float**** train_x, float**** test_x, float** train_label, float** test_label);
 };
