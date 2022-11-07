@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/data
+/outputdata
+/Pedestrian_TrainingDataset_PNG/64x32_part_balance_v2

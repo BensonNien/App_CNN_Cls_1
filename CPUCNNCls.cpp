@@ -205,8 +205,8 @@ void CPUCNN::BackPropagation(float**** x, float** y)
 void CPUCNN::Forward(float**** x)
 {
 	SetInLayerOutput(x);
-	VECCPUCNNLayers::iterator iter = vec_layers_.begin();
-	iter++;
+	VECCPUCNNLayers::iterator iter = vec_layers_.begin()+1;
+	//iter++;
 	for (iter; iter < vec_layers_.end(); iter++)
 	{
 		switch ((*iter).GetType())
@@ -237,15 +237,17 @@ void CPUCNN::SetInLayerOutput(float**** x)
 	VECCPUCNNLayers::iterator iter = vec_layers_.begin();
 
 	RectSize map_size = (*iter).GetMapSize();
+	size_t out_map_num = (*iter).GetOutMapNum();
+
 	if (IMG_H != map_size.x)
 	{
 		std::cout << "IMG_H != mapSize_.x" << std::endl;
 	}
 	for (int i = 0; i < batch_size_; i++)
 	{
-		for (int c = 0; c < g_input_num_channel; c++)
+		for (int c = 0; c < out_map_num; c++)
 		{
-			int shift_idx_batch_map = i * g_input_num_channel * map_size.x * map_size.y;
+			int shift_idx_batch_map = i * out_map_num * map_size.x * map_size.y;
 			int shift_idx_out_map = c * map_size.x * map_size.y;
 			SetInLayerValue(((*iter).vec_output_maps_.data()+ shift_idx_batch_map+ shift_idx_out_map), x[i][c], IMG_H, IMG_W);
 			//memcpy();
@@ -896,6 +898,8 @@ void CPUCNN::SetConvErrors(CPUCNNLayer& layer, CPUCNNLayer& nextLayer)
 	vector<float> vec_layer_outkroneckermatrix;
 	vec_layer_outmatrix.reserve(layer_outmap_rows * layer_outmap_cols);
 	vec_layer_outkroneckermatrix.reserve(layer_outmap_rows * layer_outmap_cols);
+	vec_layer_outmatrix.resize(layer_outmap_rows * layer_outmap_cols);
+	vec_layer_outkroneckermatrix.resize(layer_outmap_rows * layer_outmap_cols);
 	RectSize layer_scale_size = layer.GetScaleSize();
 
 	for (int idx_batch = 0; idx_batch < batch_size_; idx_batch++)
@@ -944,7 +948,7 @@ void CPUCNN::UpdateParas()
 	{
 		g_idx_itor = g_idx_itor + 1;
 		sprintf(str_file_kernel, "./data/kernel_weight/kernel_weight_%d_%d", g_idx_itor, (*iter).GetType());
-		sprintf(str_file_bias, "./data/bias_/bias_%d_%d", g_idx_itor, (*iter).GetType());
+		sprintf(str_file_bias, "./data/bias/bias_%d_%d", g_idx_itor, (*iter).GetType());
 		//printf("%s", str_file_kernel);
 
 		switch ((*iter).GetType())

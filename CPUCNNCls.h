@@ -56,13 +56,14 @@ private:
 public:
 	CPUCNN(CPUCNNLayerCreater layer_creater, int batch_size)
 	{
-		eta_conv_ = 0.0; //learning rate: ReLU using 0.0003, Sigmoid using 0.01 
-		alpha_conv_ = 0.0;//momentum rate: 0.1 
+		eta_conv_ = 0.001; //learning rate: ReLU using 0.0003, Sigmoid using 0.01 
+		alpha_conv_ = 0.1;//momentum rate: 0.1 
 		eta_fc_ = 0.00003; //learning rate: ReLU using 0.0003, Sigmoid using 0.01 
 		alpha_fc_ = 0.01;//momentum rate: 0.1 
 		vec_layers_ = layer_creater.vec_layers_;
 		layer_num_ = vec_layers_.size();
 		this->batch_size_ = batch_size;
+		Setup(batch_size);
 		SetupTest(batch_size);
 
 	};

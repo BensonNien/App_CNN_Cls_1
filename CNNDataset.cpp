@@ -5,14 +5,10 @@ void CNNDataset::Load(float**** train_x, float**** test_x, float** train_label, 
 
 	//read image by opencv
 
-	char _posfilepath[256] = "./training_data/view007_false_missing/missing_object_64x32_rename/Training_p_";
-	//char _posfilepath[256]="./training_data/nu_false_missing/missing_object_64x32_filter_rename/Training_p_";
+	char _posfilepath[256]=".\\Pedestrian_TrainingDataset_PNG\\64x32_part_balance_v2\\pos\\Training_p_";
+	char _negfilepath[256]=".\\Pedestrian_TrainingDataset_PNG\\64x32_part_balance_v2\\neg\\Training_n_";
 
-
-	char _negfilepath[256] = "./training_data/view007_false_missing/false_object_64x32_filter_rename/Training_n_";
-	//char _negfilepath[256]="./training_data/nu_false_missing/false_object_64x32_filter_rename2/Training_n_";
-
-	char _imgfileextension[16] = ".bmp";
+	char _imgfileextension[16] = ".png";
 	char _input_posfilename[512];
 	char _input_negfilename[512];
 
@@ -25,7 +21,7 @@ void CNNDataset::Load(float**** train_x, float**** test_x, float** train_label, 
 	int numOfPositiveCloning = 1;//clone positive sample
 
 
-	for (int k = 0; k < 330; k++)//330
+	for (int k = 0; k < 1000; k++)//330
 	{
 		num_charaters_pos1 = sprintf(_input_posfilename, "%s%d%s", _posfilepath, k, _imgfileextension);
 		printf("number of charaters: %d, string: \"%s\"\n", num_charaters_pos1, _input_posfilename);
@@ -56,8 +52,8 @@ void CNNDataset::Load(float**** train_x, float**** test_x, float** train_label, 
 	}
 
 
-	int numOfNegativeCloning = 22;//clone negative sample //22
-	for (int k = 0; k < 15; k++)//15
+	int numOfNegativeCloning = 1;//clone negative sample //22
+	for (int k = 0; k < 1000; k++)//15
 	{
 		num_charaters_neg1 = sprintf(_input_negfilename, "%s%d%s", _negfilepath, k, _imgfileextension);
 		printf("number of charaters: %d, string: \"%s\"\n", num_charaters_neg1, _input_negfilename);

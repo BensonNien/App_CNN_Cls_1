@@ -23,7 +23,7 @@ int main()
 	// initialize input data
 	float**** train_x, **** test_x;
 	float** train_label, ** test_label;
-	int NumberOfImages = 660;//Total training data//nu 5850
+	int NumberOfImages = 2000;//Total training data//nu 5850
 	int NumOfChannel = 3;// image's channel
 
 	train_x = new float*** [NumberOfImages];
@@ -71,9 +71,9 @@ int main()
 	CPUCNN cnn = CPUCNN(layer_creater, 2);// batchsize
 
 	float t0 = EvlElapsedTime();
-	cnn.LoadParas();//load kernel weight & bias
+	//cnn.LoadParas();//load kernel weight & bias
 
-	for (int i = 0; i < 1; i++)//i is training epoch
+	for (int i = 0; i < 100; i++)//i is training epoch
 	{
 		cout << "No.of Training: " << i << endl;
 		float t1 = EvlElapsedTime();

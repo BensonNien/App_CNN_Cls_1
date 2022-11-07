@@ -54,7 +54,7 @@ void ConvNValid(float* p_matrix, float* p_kernel, int map_size_row, int map_size
 					sum += p_matrix[((i + ki) * map_size_col) + (j + kj)] * p_kernel[(ki * kernel_size_col) + kj];
 				}
 			}
-			outmatrix[(i * map_size_col) + j] = sum;
+			outmatrix[(i * num_conv_col) + j] = sum;
 		}
 	}
 }
@@ -538,6 +538,7 @@ CPUCNNLayer CPUCNNLayer::CreateInputLayer(int input_map_num, RectSize map_size)
 	CPUCNNLayer layer;
 	layer.layer_type_ = 'I';
 	layer.in_map_num_ = input_map_num;
+	layer.out_map_num_= input_map_num;
 	layer.map_size_ = map_size;
 	return layer;
 }
@@ -584,6 +585,7 @@ CPUCNNLayer CPUCNNLayer::CreateOutputLayer(int class_num)
 
 void CPUCNNLayer::InitKernel(int front_map_num) {
 	vec_kernel_.reserve(front_map_num * out_map_num_ * kernel_size_.x * kernel_size_.y);
+	vec_kernel_.resize(front_map_num * out_map_num_ * kernel_size_.x * kernel_size_.y);
 	int shift_idx_front_map = 0;
 	int shift_idx_out_map = 0;
 
@@ -601,10 +603,11 @@ void CPUCNNLayer::InitKernel(int front_map_num) {
 void CPUCNNLayer::InitLastStepDeltaKernel(int front_map_num)
 {
 	vec_laststep_delta_kernel_.reserve(front_map_num * out_map_num_ * kernel_size_.x * kernel_size_.y);
+	vec_laststep_delta_kernel_.resize(front_map_num * out_map_num_ * kernel_size_.x * kernel_size_.y);
+	vec_laststep_delta_kernel_.assign(vec_laststep_delta_kernel_.size(), 0.0);
+
 	int shift_idx_front_map = 0;
 	int shift_idx_out_map = 0;
-
-	vec_laststep_delta_kernel_.assign(vec_laststep_delta_kernel_.size(), 0.0);
 
 	/*for (int i = 0; i < front_map_num; i++)
 	{
@@ -627,6 +630,7 @@ void CPUCNNLayer::InitOutputKernel(int front_map_num, RectSize Kernel_size)
 {
 	kernel_size_ = Kernel_size;
 	vec_kernel_.reserve(front_map_num * out_map_num_ * kernel_size_.x * kernel_size_.y);
+	vec_kernel_.resize(front_map_num * out_map_num_ * kernel_size_.x * kernel_size_.y);
 	int shift_idx_front_map = 0;
 	int shift_idx_out_map = 0;
 
@@ -646,21 +650,25 @@ void CPUCNNLayer::InitOutputLastStepDeltaKernel(int front_map_num, RectSize Kern
 {
 	kernel_size_ = Kernel_size;
 	vec_laststep_delta_kernel_.reserve(front_map_num * out_map_num_ * kernel_size_.x * kernel_size_.y);
+	vec_laststep_delta_kernel_.resize(front_map_num * out_map_num_ * kernel_size_.x * kernel_size_.y);
 	vec_laststep_delta_kernel_.assign(vec_laststep_delta_kernel_.size(), 0.0);
 }
 void CPUCNNLayer::InitErros(int batch_size)
 {
 	vec_errors_.reserve(batch_size * out_map_num_ * map_size_.x * map_size_.y);
+	vec_errors_.resize(batch_size * out_map_num_ * map_size_.x * map_size_.y);
 	vec_errors_.assign(vec_errors_.size(), 0.0);
 }
 void CPUCNNLayer::InitOutputMaps(int batch_size)
 {
 	vec_output_maps_.reserve(batch_size * out_map_num_ * map_size_.x * map_size_.y);
+	vec_output_maps_.resize(batch_size * out_map_num_ * map_size_.x * map_size_.y);
 	vec_output_maps_.assign(vec_errors_.size(), 0.0);
 }
 void CPUCNNLayer::InitBias(int front_map_num, int idx_iter)
 {
 	vec_bias_.reserve(out_map_num_);
+	vec_bias_.resize(out_map_num_);
 	vec_bias_.assign(vec_bias_.size(), 0.1);
 }
 void CPUCNNLayer::SetError(int num_batch, int map_no, int map_x, int map_y, float error_val)
