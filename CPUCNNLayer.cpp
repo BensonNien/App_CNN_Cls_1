@@ -566,7 +566,7 @@ CPUCNNLayer CPUCNNLayer::CreateFullyConnectedHiddenLayer(int input_element_num, 
 	layer.class_num_ = class_num;
 	layer.layer_type_ = 'H';
 	layer.map_size_ = RectSize(1, 1);
-	layer.out_map_num_ = class_num;
+	layer.out_map_num_ = output_element_num;
 	return layer;
 
 }

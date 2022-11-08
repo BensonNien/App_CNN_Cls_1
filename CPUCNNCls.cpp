@@ -581,11 +581,11 @@ void CPUCNN::SetOutLayerErrors(float**** input_maps, float** target_labels)
 	int mapNum = (*iter).GetOutMapNum();
 	float meanError = 0.0, maxError = 0.0;
 
-	FILE* fy;
-	fy = fopen("./outputdata/error.txt", "a");
+	//FILE* fy;
+	//fy = fopen("./outputdata/error.txt", "a");
 
-	//if( (err=fopen_s(&fy, "error.txt", "a")) != 0 )
-	//	exit(1) ;
+	////if( (err=fopen_s(&fy, "error.txt", "a")) != 0 )
+	////	exit(1) ;
 
 	for (int idx_batch = 0; idx_batch < batch_size_; idx_batch++)
 	{
@@ -616,19 +616,19 @@ void CPUCNN::SetOutLayerErrors(float**** input_maps, float** target_labels)
 			meanError = abs(val_target_label - val_out_map);
 #endif
 
-			fprintf(fy, "%f ", meanError);
-			// 			meanError += abs(val_target_label-val_out_map);
-			// 			if (abs(val_target_label-val_out_map)>maxError)
-			// 			{
-			// 				maxError = abs(val_target_label-val_out_map);
-			// 			}
+			//fprintf(fy, "%f ", meanError);
+			//// 			meanError += abs(val_target_label-val_out_map);
+			//// 			if (abs(val_target_label-val_out_map)>maxError)
+			//// 			{
+			//// 				maxError = abs(val_target_label-val_out_map);
+			//// 			}
 		}
-		fprintf(fy, "\n");
+		//fprintf(fy, "\n");
 	}
-	fprintf(fy, "\n");
-	fclose(fy);
-	// 	std::cout<<"Mean error of each mini batch: "<<meanError<<std::endl;
-	// 	std::cout<<"The max error of one output in mini batch: "<<maxError<<std::endl;
+	//fprintf(fy, "\n");
+	//fclose(fy);
+	//// 	std::cout<<"Mean error of each mini batch: "<<meanError<<std::endl;
+	//// 	std::cout<<"The max error of one output in mini batch: "<<maxError<<std::endl;
 }
 
 
@@ -654,34 +654,36 @@ void CPUCNN::SetFCHiddenLayerErrors(CPUCNNLayer& Lastlayer, CPUCNNLayer& layer, 
 	vector<float> vec_layer_outmatrix;
 	vector<float> vec_layer_outkroneckermatrix;
 	vec_layer_outmatrix.reserve(layer_outmap_rows * layer_outmap_cols);
+	vec_layer_outmatrix.resize(layer_outmap_rows * layer_outmap_cols);
 	vec_layer_outkroneckermatrix.reserve(layer_outmap_rows * layer_outmap_cols);
+	vec_layer_outkroneckermatrix.resize(layer_outmap_rows * layer_outmap_cols);
 	RectSize layer_scale_size = layer.GetScaleSize();
 
-	for (int idx_batch = 0; idx_batch < batch_size_; idx_batch++)
-	{
-		for (int idx_layer_outmap = 0; idx_layer_outmap < layer_outmap_num; idx_layer_outmap++)
-		{
-			p_layer_error = layer.GetError(idx_batch, idx_layer_outmap);
-			/*for (int ii = 0; ii < layer_outmap_rows; ii++) {
-				for (int jj = 0; jj < layer_outmap_cols; jj++) {
-					printf("p_layer_error[%d][%d][%d][%d]: %f\n", idx_batch, idx_layer_outmap, ii, jj, p_layer_error[ii][jj]);
-				}
-			}*/
-		}
-	}
+	//for (int idx_batch = 0; idx_batch < batch_size_; idx_batch++)
+	//{
+	//	for (int idx_layer_outmap = 0; idx_layer_outmap < layer_outmap_num; idx_layer_outmap++)
+	//	{
+	//		p_layer_error = layer.GetError(idx_batch, idx_layer_outmap);
+	//		/*for (int ii = 0; ii < layer_outmap_rows; ii++) {
+	//			for (int jj = 0; jj < layer_outmap_cols; jj++) {
+	//				printf("p_layer_error[%d][%d][%d][%d]: %f\n", idx_batch, idx_layer_outmap, ii, jj, p_layer_error[ii][jj]);
+	//			}
+	//		}*/
+	//	}
+	//}
 
-	for (int idx_batch = 0; idx_batch < batch_size_; idx_batch++)
-	{
-		for (int idx_nextlayer_outmap = 0; idx_nextlayer_outmap < nextlayer_outmap_num; idx_nextlayer_outmap++)
-		{
-			p_layer_error = nextLayer.GetError(idx_batch, idx_nextlayer_outmap);
-			//for (int ii = 0; ii < nextlayer_outmap_rows; ii++) {
-			//	for (int jj = 0; jj < nextlayer_outmap_cols; jj++) {
-			//		printf("p_layer_error[%d][%d][%d][%d]: %f\n", idx_batch, idx_nextlayer_outmap, ii, jj, p_layer_error[ii][jj]);
-			//	}
-			//}
-		}
-	}
+	//for (int idx_batch = 0; idx_batch < batch_size_; idx_batch++)
+	//{
+	//	for (int idx_nextlayer_outmap = 0; idx_nextlayer_outmap < nextlayer_outmap_num; idx_nextlayer_outmap++)
+	//	{
+	//		p_layer_error = nextLayer.GetError(idx_batch, idx_nextlayer_outmap);
+	//		//for (int ii = 0; ii < nextlayer_outmap_rows; ii++) {
+	//		//	for (int jj = 0; jj < nextlayer_outmap_cols; jj++) {
+	//		//		printf("p_layer_error[%d][%d][%d][%d]: %f\n", idx_batch, idx_nextlayer_outmap, ii, jj, p_layer_error[ii][jj]);
+	//		//	}
+	//		//}
+	//	}
+	//}
 	//printf("================================================================================\n");
 
 	int nextlayer_kernel_rows = nextLayer.GetKernelSize().x;
@@ -689,24 +691,25 @@ void CPUCNN::SetFCHiddenLayerErrors(CPUCNNLayer& Lastlayer, CPUCNNLayer& layer, 
 	//float** nextkernel;
 	float* p_nextlayer_kernel = nullptr;
 
-	for (int i = 0; i < layer_outmap_num; i++)
-	{
-		for (int j = 0; j < nextlayer_outmap_num; j++)
-		{
-			p_nextlayer_kernel = nextLayer.GetKernel(i, j);
-			//for (int ii = 0; ii < nextlayer_kernel_rows; ii++)
-			//{
-			//	for (int jj = 0; jj < nextlayer_kernel_cols; jj++)
-			//	{
-			//		printf("p_nextlayer_kernel[%d][%d][%d][%d]: %f\n", i, j, ii, jj, p_nextlayer_kernel[ii][jj]);
-			//	}
-			//}
-		}
-	}
+	//for (int i = 0; i < layer_outmap_num; i++)
+	//{
+	//	for (int j = 0; j < nextlayer_outmap_num; j++)
+	//	{
+	//		p_nextlayer_kernel = nextLayer.GetKernel(i, j);
+	//		//for (int ii = 0; ii < nextlayer_kernel_rows; ii++)
+	//		//{
+	//		//	for (int jj = 0; jj < nextlayer_kernel_cols; jj++)
+	//		//	{
+	//		//		printf("p_nextlayer_kernel[%d][%d][%d][%d]: %f\n", i, j, ii, jj, p_nextlayer_kernel[ii][jj]);
+	//		//	}
+	//		//}
+	//	}
+	//}
 	//printf("================================================================================\n");
 
 	vector<float> vec_derivative_active_fun;
 	vec_derivative_active_fun.reserve(batch_size_ * layer_outmap_num);
+	vec_derivative_active_fun.resize(batch_size_ * layer_outmap_num);
 
 	for (int idx_batch = 0; idx_batch < batch_size_; idx_batch++)
 	{
@@ -979,16 +982,16 @@ void CPUCNN::UpdateBias(CPUCNNLayer& layer, char* str_File_Bias, float eta)
 	int layer_outmap_num = layer.GetOutMapNum();
 	int layer_outmap_rows = layer.GetMapSize().x;
 	int layer_outmap_cols = layer.GetMapSize().y;
-	float* p_layer_errors = layer.vec_errors_.data();
+	float* p_layer_error = layer.vec_errors_.data();
 	vector<float> vec_error((layer_outmap_rows* layer_outmap_cols), 0.0);
 	float deltaBias = 0.0;
 
 	for (int idx_layer_outmap = 0; idx_layer_outmap < layer_outmap_num; idx_layer_outmap++)
 	{
 
-		CalErrorsSum(p_layer_errors, idx_layer_outmap, layer_outmap_num, layer_outmap_rows, layer_outmap_cols, batch_size_, vec_error.data());
-		deltaBias = (CalErrorSum(vec_error.data(), layer_outmap_rows, layer_outmap_cols) / batch_size_);
-		layer.vec_bias_.at(idx_layer_outmap) = layer.vec_bias_.at(idx_layer_outmap) + (eta * deltaBias);
+		CalErrorsSum(p_layer_error, idx_layer_outmap, layer_outmap_num, layer_outmap_rows, layer_outmap_cols, batch_size_, vec_error.data());
+		deltaBias = (CalErrorSum(vec_error.data(), layer_outmap_rows, layer_outmap_cols) / ((float)batch_size_));
+		layer.vec_bias_.at(idx_layer_outmap) += (eta * deltaBias);
 
 		/***save bias_***/
 		if ((g_iteration_num - 1) == g_idx_iteration_num) {
@@ -1113,7 +1116,7 @@ void CPUCNN::LoadParas()
 	{
 		g_idx_itor = g_idx_itor + 1;
 		sprintf(str_file_kernel, "./data/kernel_weight/kernel_weight_%d_%d", g_idx_itor, (*iter).GetType());
-		sprintf(str_file_bias, "./data/bias_/bias_%d_%d", g_idx_itor, (*iter).GetType());
+		sprintf(str_file_bias, "./data/bias/bias_%d_%d", g_idx_itor, (*iter).GetType());
 		//printf("%s", str_file_kernel);
 
 		switch ((*iter).GetType())
@@ -1139,23 +1142,23 @@ void CPUCNN::LoadParas()
 void CPUCNN::LoadBias(CPUCNNLayer& layer, char* str_File_Bias)
 {
 	int layer_outmap_num = layer.GetOutMapNum();
+	float bias = 0.0;
 
 	for (int idx_layer_outmap = 0; idx_layer_outmap < layer_outmap_num; idx_layer_outmap++)
 	{
-
-		float bias;
+		bias = 0.0;
 		/***load bias***/
 		char str_file_bias_1[1000];
 		sprintf(str_file_bias_1, "%s_%d.txt", str_File_Bias, idx_layer_outmap);
 		printf("%s\n", str_file_bias_1);
 		FILE* fp_bias = fopen(str_file_bias_1, "r");
-
 		fscanf(fp_bias, "%f ", &bias);
-		layer.vec_bias_.at(idx_layer_outmap) = bias;
+		fclose(fp_bias);
 
+		layer.vec_bias_.at(idx_layer_outmap) = bias;
 		printf("bias: %f\n", layer.vec_bias_.at(idx_layer_outmap));
 	}
-
+	
 }
 
 void CPUCNN::LoadKernels(CPUCNNLayer& layer, CPUCNNLayer& lastLayer, char* str_File_Kernel)
@@ -1184,7 +1187,7 @@ void CPUCNN::LoadKernels(CPUCNNLayer& layer, CPUCNNLayer& lastLayer, char* str_F
 			char str_file_kernel_1[1000];
 			sprintf(str_file_kernel_1, "%s_%d_%d.txt", str_File_Kernel, idx_lastlayer_outmap, idx_layer_outmap);
 			printf("%s\n", str_file_kernel_1);
-			FILE* fp = fopen(str_file_kernel_1, "r");
+			FILE* fp_kernel = fopen(str_file_kernel_1, "r");
 
 			for (int mm = 0; mm < layer_kernel_rows; mm++)
 			{
@@ -1194,13 +1197,13 @@ void CPUCNN::LoadKernels(CPUCNNLayer& layer, CPUCNNLayer& lastLayer, char* str_F
 					shift_idx_layer_kernel_layer = idx_layer_outmap * layer_kernel_rows * layer_kernel_cols;
 					idx_layer_kernel = shift_idx_layer_kernel_lastlayer + shift_idx_layer_kernel_layer + (mm * layer_kernel_cols + nn);
 
-					fscanf(fp, "%f ", (vec_kernel.data()+(mm * layer_kernel_cols + nn)));
+					fscanf(fp_kernel, "%f ", (vec_kernel.data()+(mm * layer_kernel_cols + nn)));
 					layer.vec_kernel_.at(idx_layer_kernel) = vec_kernel.at(mm * layer_kernel_cols + nn);
 					printf("kernel_: %f\n", layer.vec_kernel_.at(idx_layer_kernel));
 				}
 
 			}
-
+			fclose(fp_kernel);
 		}
 	}
 }

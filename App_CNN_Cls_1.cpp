@@ -64,8 +64,7 @@ int main()
 	layer_creater.AddLayer(layer.CreateConvLayer(12, 20, RectSize(4, 4)));//convolutional layer output feature map's deep number, kernel RectSize
 	layer_creater.AddLayer(layer.CreateSampLayer(RectSize(2, 2)));//Downsampling layer kernel RectSize
 
-	//layer_creater.AddLayer(layer.CreateFullyConnectedHiddenLayer(20));//Fully connected hidden layer node number
-	//layer_creater.AddLayer(layer.CreateFullyConnectedHiddenLayer(20));//Fully connected hidden layer node number
+	layer_creater.AddLayer(layer.CreateFullyConnectedHiddenLayer(20, 14, 2));//Fully connected hidden layer node number
 	layer_creater.AddLayer(layer.CreateOutputLayer(2));//output layer node number
 
 	CPUCNN cnn = CPUCNN(layer_creater, 2);// batchsize
@@ -73,7 +72,7 @@ int main()
 	float t0 = EvlElapsedTime();
 	//cnn.LoadParas();//load kernel weight & bias
 
-	for (int i = 0; i < 100; i++)//i is training epoch
+	for (int i = 0; i < 50; i++)//i is training epoch
 	{
 		cout << "No.of Training: " << i << endl;
 		float t1 = EvlElapsedTime();
