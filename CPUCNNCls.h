@@ -56,10 +56,10 @@ private:
 public:
 	CPUCNN(CPUCNNLayerCreater layer_creater, int batch_size)
 	{
-		eta_conv_ = 0.01; //learning rate 
-		alpha_conv_ = 0.4;//momentum rate
-		eta_fc_ = 0.01; //learning rate
-		alpha_fc_ = 0.4;//momentum rate
+		eta_conv_ = 0.006; //learning rate 
+		alpha_conv_ = 0.2;//momentum rate
+		eta_fc_ = 0.006; //learning rate
+		alpha_fc_ = 0.2;//momentum rate
 		vec_layers_ = layer_creater.vec_layers_;
 		layer_num_ = vec_layers_.size();
 		this->batch_size_ = batch_size;

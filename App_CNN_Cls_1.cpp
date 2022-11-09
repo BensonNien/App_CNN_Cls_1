@@ -21,36 +21,45 @@ int main()
 {
 	std::cout << "\n====================== Prog. Start ======================\n";
 	// initialize input data
-	float**** train_x, **** test_x;
-	float** train_label, ** test_label;
-	int NumberOfImages = 2000;//Total training data//nu 5850
-	int NumOfChannel = 3;// image's channel
+	float**** p_train_images, **** p_test_images;
+	float** p_train_labels, ** p_test_labels;
+	int num_images = 2000;//Total training data//nu 5850
+	int num_pos_images = 1000;
+	int num_neg_images = 1000;
+	int channels_image = 3;
 
-	train_x = new float*** [NumberOfImages];
-	test_x = new float*** [NumberOfImages];
-	train_label = new float* [NumberOfImages];
-	test_label = new float* [NumberOfImages];
-	for (int i = 0; i < NumberOfImages; i++)
+	std::string pos_images_root_path = ".\\Pedestrian_TrainingDataset_PNG\\64x32_part_balance_v2\\pos\\Training_p_";
+	std::string neg_images_root_path = ".\\Pedestrian_TrainingDataset_PNG\\64x32_part_balance_v2\\neg\\Training_n_";
+	std::string images_ext = ".png";
+
+	p_train_images = new float*** [num_images];
+	p_test_images = new float*** [num_images];
+	p_train_labels = new float* [num_images];
+	p_test_labels = new float* [num_images];
+	for (int i = 0; i < num_images; i++)
 	{
-		train_x[i] = new float** [NumOfChannel];
-		test_x[i] = new float** [NumOfChannel];
-		for (int c = 0; c < NumOfChannel; c++)
+		p_train_images[i] = new float** [channels_image];
+		p_test_images[i] = new float** [channels_image];
+		for (int c = 0; c < channels_image; c++)
 		{
-			train_x[i][c] = new float* [IMG_H];
-			test_x[i][c] = new float* [IMG_H];
+			p_train_images[i][c] = new float* [IMG_H];
+			p_test_images[i][c] = new float* [IMG_H];
 
 			for (int j = 0; j < IMG_H; j++)
 			{
-				train_x[i][c][j] = new float[IMG_W];
-				test_x[i][c][j] = new float[IMG_W];
+				p_train_images[i][c][j] = new float[IMG_W];
+				p_test_images[i][c][j] = new float[IMG_W];
 			}
 		}
-		train_label[i] = new float[2];
-		test_label[i] = new float[2];
+		p_train_labels[i] = new float[2];
+		p_test_labels[i] = new float[2];
 	}
 
+	DatasetLoadingParamPKG dataset_param(p_train_images, p_test_images, 
+		p_train_labels, p_test_labels, num_pos_images, num_neg_images, channels_image, 
+		pos_images_root_path, neg_images_root_path, images_ext);
 
-	CNNDataset::Load(train_x, test_x, train_label, test_label);//load data & label
+	CNNDataset::Load(dataset_param);
 
 	// constructor CPUCNN
 	CPUCNNLayerCreater layer_creater;
@@ -76,11 +85,11 @@ int main()
 	{
 		cout << "No.of Training: " << i << endl;
 		float t1 = EvlElapsedTime();
-		cnn.Train(train_x, train_label, NumberOfImages);
+		cnn.Train(p_train_images, p_train_labels, num_images);
 		float t2 = EvlElapsedTime();
 		cout << t2 - t1 << " s" << endl << i + 1 << endl;
 		cout << "No.of Testing: " << i << endl;
-		cnn.Inference(test_x, test_label, NumberOfImages);
+		cnn.Inference(p_test_images, p_test_labels, num_images);
 	}
 
 	float te = EvlElapsedTime();
@@ -88,41 +97,41 @@ int main()
 
 	//for testing
 	cnn.LoadParas();//load kernel weight & bias
-	cnn.Inference(test_x,test_label, NumberOfImages);
+	cnn.Inference(p_test_images,p_test_labels, num_images);
 
 
 	// delete data
-	for (int i = 0; i < NumberOfImages; i++)
+	for (int i = 0; i < num_images; i++)
 	{
-		delete[]train_label[i];
-		for (int c = 0; c < NumOfChannel; c++)
+		delete[]p_train_labels[i];
+		for (int c = 0; c < channels_image; c++)
 		{
 			for (int j = 0; j < IMG_H; j++)
 			{
-				delete[]train_x[i][c][j];
+				delete[]p_train_images[i][c][j];
 			}
-			delete[]train_x[i][c];
+			delete[]p_train_images[i][c];
 		}
-		delete[]train_x[i];
+		delete[]p_train_images[i];
 	}
 
-	for (int i = 0; i < NumberOfImages; i++)
+	for (int i = 0; i < num_images; i++)
 	{
-		delete[]test_label[i];
-		for (int c = 0; c < NumOfChannel; c++)
+		delete[]p_test_labels[i];
+		for (int c = 0; c < channels_image; c++)
 		{
 			for (int j = 0; j < IMG_H; j++)
 			{
-				delete[]test_x[i][c][j];
+				delete[]p_test_images[i][c][j];
 			}
-			delete[]test_x[i][c];
+			delete[]p_test_images[i][c];
 		}
-		delete[]test_x[i];
+		delete[]p_test_images[i];
 	}
-	delete[]train_label;
-	delete[]train_x;
-	delete[]test_x;
-	delete[]test_label;
+	delete[]p_train_labels;
+	delete[]p_train_images;
+	delete[]p_test_images;
+	delete[]p_test_labels;
 	std::cout << "\n====================== Prog. End ======================\n";
 	return 0;
     

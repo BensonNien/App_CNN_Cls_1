@@ -19,7 +19,7 @@ void RandomMatrix(int size_row, int size_col, float* p_kernel)
 	// construct a trivial random generator engine from a time-based seed:
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	std::default_random_engine generator(seed);
-	std::normal_distribution<float> distribution(0, 0.1);
+	std::normal_distribution<float> distribution(0, 0.14);
 
 	cout << "--------------- kernel's content -----------------" << endl;
 	for (int i = 0; i < size_row; i++)
@@ -74,7 +74,7 @@ void ActiveRelu(float* p_matrix, float bias, int m, int n)
 			}
 			else if (0.0 == x1 || x1 < 0.0) {
 
-				p_matrix[(i * n) + j] = 0.0;//0.01
+				p_matrix[(i * n) + j] = 0.0;
 
 			}
 			else {
