@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 class RectSize
 {
@@ -43,33 +44,41 @@ public:
 };
 
 struct DatasetLoadingParamPKG {
-	float**** p_train_images_ = nullptr;
-	float**** p_test_images_ = nullptr;
-	float** p_train_labels_ = nullptr;
-	float** p_test_labels_ = nullptr;
-	int num_pos_images_ = 0;
-	int num_neg_images_ = 0;
-	int channels_image_ = 0;
+	std::vector<float> vec_images_;
+	std::vector<float> vec_labels_;
+	size_t total_num_images_ = 0;
+	size_t num_pos_images_ = 0;
+	size_t num_neg_images_ = 0;
+	size_t rows_image_ = 0;
+	size_t cols_image_ = 0;
+	size_t channels_image_ = 0;
+	size_t num_output_cls_ = 0;
 	std::string pos_images_root_path_;
 	std::string neg_images_root_path_;
 	std::string images_ext_;
 
-	DatasetLoadingParamPKG(float**** p_train_images, float**** p_test_images, 
-		float** p_train_labels, float** p_test_labels, int num_pos_images, int num_neg_images, int channels_image,
-		std::string pos_images_root_path, std::string neg_images_root_path, std::string images_ext) 
+	DatasetLoadingParamPKG(size_t num_pos_images, size_t num_neg_images,
+		size_t rows_image, size_t cols_image, size_t channels_image, size_t num_output_cls,
+		std::string pos_images_root_path, std::string neg_images_root_path,
+		std::string images_ext)
 	{
 
-		p_train_images_ = p_train_images;
-		p_test_images_ = p_test_images;
-		p_train_labels_ = p_train_labels;
-		p_test_labels_ = p_test_labels;
+		total_num_images_ = num_pos_images + num_neg_images;
 		num_pos_images_ = num_pos_images;
 		num_neg_images_ = num_neg_images;
+		rows_image_ = rows_image;
+		cols_image_ = cols_image;
 		channels_image_ = channels_image;
+		num_output_cls_ = num_output_cls;
 
 		pos_images_root_path_ = pos_images_root_path;
 		neg_images_root_path_ = neg_images_root_path;
 		images_ext_ = images_ext;
+
+		vec_images_.reserve(total_num_images_ * channels_image_ * rows_image_ * cols_image_);
+		vec_images_.resize(total_num_images_ * channels_image_ * rows_image_ * cols_image_);
+		vec_labels_.reserve(total_num_images_ * num_output_cls_);
+		vec_labels_.resize(total_num_images_ * num_output_cls_);
 
 	}
 

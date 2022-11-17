@@ -58,8 +58,8 @@ void CalArrayMultiply(float* matrix, float val, int m, int n);// array multiply 
 void SetInLayerValue(float* maps, float** sum, int m, int n);
 void SetKernelValue(float* maps, float* sum, int m, int n);
 int findIndex(float*** p);
-int FindIndex(float* p_batch_maps, int map_num, int map_rows, int map_cols);
-int FindIndex(float* p);
+size_t FindIndex(float* p_batch_maps, size_t map_num, size_t map_rows, size_t map_cols);
+size_t FindIndex(float* p_batch_labels, size_t map_num);
 
 // CPUCNNLayer
 

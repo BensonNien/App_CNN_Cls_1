@@ -464,7 +464,7 @@ int findIndex(float*** p)
 	return index;
 }
 
-int FindIndex(float* p_batch_maps, int map_num, int map_rows, int map_cols)
+size_t FindIndex(float* p_batch_maps, size_t map_num, size_t map_rows, size_t map_cols)
 {
 
 	FILE* fy;
@@ -473,13 +473,13 @@ int FindIndex(float* p_batch_maps, int map_num, int map_rows, int map_cols)
 	if( (err=fopen_s(&fy, "outputmaps_.txt", "a")) != 0 )
 		exit(1) ;
 	*/
-	int shift_idx_layer_out_map = 0 * map_rows * map_cols;
-	int idx_layer_out_map = shift_idx_layer_out_map + (0 * map_cols + 0);
-	int index = 0;
+	size_t shift_idx_layer_out_map = 0 * map_rows * map_cols;
+	size_t idx_layer_out_map = shift_idx_layer_out_map + (0 * map_cols + 0);
+	size_t index = 0;
 	float v;
 	float Max = p_batch_maps[idx_layer_out_map];
 	fprintf(fy, "%f ", Max);
-	for (int i = 1; i < map_num; i++)
+	for (size_t i = 1; i < map_num; i++)
 	{
 		shift_idx_layer_out_map = i * map_rows * map_cols;
 		idx_layer_out_map = shift_idx_layer_out_map + (0 * map_cols + 0);
@@ -495,16 +495,16 @@ int FindIndex(float* p_batch_maps, int map_num, int map_rows, int map_cols)
 	return index;
 }
 
-int FindIndex(float* p)
+size_t FindIndex(float* p_batch_labels, size_t map_num)
 {
-	int index = 0;
-	float Max = p[0];
-	for (int i = 1; i < 2; i++)
+	size_t index = 0;
+	float Max = p_batch_labels[0];
+	for (size_t i = 1; i < map_num; i++)
 	{
-		float v = p[i];
-		if (p[i] > Max)
+		float v = p_batch_labels[i];
+		if (p_batch_labels[i] > Max)
 		{
-			Max = p[i];
+			Max = p_batch_labels[i];
 			index = i;
 		}
 	}
@@ -609,22 +609,6 @@ void CPUCNNLayer::InitLastStepDeltaKernel(int front_map_num)
 	int shift_idx_front_map = 0;
 	int shift_idx_out_map = 0;
 
-	/*for (int i = 0; i < front_map_num; i++)
-	{
-		shift_idx_front_map = i * out_map_num_ * kernel_size_.x * kernel_size_.y;
-		for (int j = 0; j < out_map_num_; j++)
-		{
-			shift_idx_out_map = j * kernel_size_.x * kernel_size_.y;
-			for (int ii = 0; ii < kernel_size_.x; ii++)
-			{
-				for (int jj = 0; jj < kernel_size_.y; jj++)
-				{
-					vec_laststep_delta_kernel_[shift_idx_front_map + shift_idx_out_map + i * kernel_size_.y + j] = 0.0;
-				}
-			}
-		}
-	}*/
-
 }
 void CPUCNNLayer::InitOutputKernel(int front_map_num, RectSize Kernel_size)
 {
@@ -663,7 +647,7 @@ void CPUCNNLayer::InitOutputMaps(int batch_size)
 {
 	vec_output_maps_.reserve(batch_size * out_map_num_ * map_size_.x * map_size_.y);
 	vec_output_maps_.resize(batch_size * out_map_num_ * map_size_.x * map_size_.y);
-	vec_output_maps_.assign(vec_errors_.size(), 0.0);
+	vec_output_maps_.assign(vec_output_maps_.size(), 0.0);
 }
 void CPUCNNLayer::InitBias(int front_map_num, int idx_iter)
 {

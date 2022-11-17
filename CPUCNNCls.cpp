@@ -3,6 +3,7 @@ Date:  2022/09
 Author: CHU-MIN, NIEN
 Description:
 ******************************************************************************/
+#include <algorithm>
 
 #include "CPUCNNCls.h"
 #include "CPUCNNLayer.h"
@@ -18,97 +19,57 @@ using namespace std;
 #define DERIV_ACTIVE_RELU(S) 1 // derivative of the relu as a function of the relu's output
 #define DERIV_ACTIVE_SIGMOID(S) (S*(1-S)) // derivative of the sigmoid as a function of the sigmoid's output
 
-int g_input_num_channel = 3;//image's channel
+size_t g_idx_epoch = 0;//index of epoch
+size_t g_idx_itor = 0;//index of iterator
+size_t g_idx_iter_init_bias = 0;//index of iterator for initialize bias
+size_t g_idx_iteration_num = 0;//index of iteration
+size_t g_iteration_num = 0;//number of g_iteration_num
 
-int g_idx_epoch = 0;//index of epoch
-int g_idx_itor = 0;//index of iterator
-int g_idx_iter_init_bias = 0;//index of iterator for initialize bias
-int g_idx_iteration_num = 0;//index of iteration
-int g_iteration_num = 0;//number of g_iteration_num
-
-void CPUCNN::Train(float**** train_x, float** train_label, int NumOfImage)
+void CPUCNN::Train(DatasetLoadingParamPKG& r_dataset_param)
 {
 	std::cout << "Start train" << std::endl;
 
-	g_iteration_num = NumOfImage / batch_size_;
-	if (NumOfImage % batch_size_ != 0)
+	g_iteration_num = r_dataset_param.total_num_images_ / batch_size_;
+	if ((r_dataset_param.total_num_images_ % batch_size_) != 0)
 	{
-		std::cout << "Please reset batch_size_!" << std::endl;
+		std::cout << "Please reset CPUCNN::batch_size_!" << std::endl;
 	}
-	float**** Train;
-	float** TrainLabel;
 
-	Train = new float*** [batch_size_];
-	TrainLabel = new float* [batch_size_];
+	float* p_train_batch_data = nullptr;
+	float* p_train_batch_label = nullptr;
+	std::vector<float> vec_train_batch_data;
+	std::vector<float> vec_train_batch_label;
+	vec_train_batch_data.reserve(batch_size_ * r_dataset_param.channels_image_ * r_dataset_param.rows_image_ * r_dataset_param.cols_image_);
+	vec_train_batch_data.resize(batch_size_ * r_dataset_param.channels_image_ * r_dataset_param.rows_image_ * r_dataset_param.cols_image_);
+	vec_train_batch_label.reserve(batch_size_ * r_dataset_param.num_output_cls_);
+	vec_train_batch_label.resize(batch_size_ * r_dataset_param.num_output_cls_);
 
 	for (g_idx_iteration_num = 0; g_idx_iteration_num < g_iteration_num; g_idx_iteration_num++)
 	{
-
 		std::cout << "NO.of iteration(training): " << g_idx_iteration_num << std::endl;
-		int ii = g_idx_iteration_num % (NumOfImage / batch_size_);
-		for (int j = 0; j < batch_size_; j++)
+		size_t idx_loaded_dataset_batch = g_idx_iteration_num % (r_dataset_param.total_num_images_ / batch_size_);
+		for (size_t idx_batch = 0; idx_batch < batch_size_; idx_batch++)
 		{
+			std::cout << "NO.of batch(training): " << idx_batch << std::endl;
 
-			std::cout << "NO.of batch(training): " << j << std::endl;
+			std::vector<float>::iterator shift_begin_iter_loaded_dataset_batch_data;
+			std::vector<float>::iterator shift_begin_iter_loaded_dataset_batch_label;
+			shift_begin_iter_loaded_dataset_batch_data = r_dataset_param.vec_images_.begin() + (idx_loaded_dataset_batch * batch_size_ * r_dataset_param.channels_image_ * r_dataset_param.rows_image_ * r_dataset_param.cols_image_);
+			shift_begin_iter_loaded_dataset_batch_label = r_dataset_param.vec_labels_.begin() + (idx_loaded_dataset_batch * batch_size_ * r_dataset_param.num_output_cls_);
+			vec_train_batch_data.assign(shift_begin_iter_loaded_dataset_batch_data, (shift_begin_iter_loaded_dataset_batch_data + (batch_size_ * r_dataset_param.channels_image_ * r_dataset_param.rows_image_ * r_dataset_param.cols_image_)));
+			vec_train_batch_label.assign(shift_begin_iter_loaded_dataset_batch_label, (shift_begin_iter_loaded_dataset_batch_label + (batch_size_ * r_dataset_param.num_output_cls_)));
 
-			if (g_idx_iteration_num == 0)
-			{
-				Train[j] = new float** [g_input_num_channel];
-			}
-			for (int c = 0; c < g_input_num_channel; c++)
-			{
-
-				if (g_idx_iteration_num == 0)
-				{
-					Train[j][c] = new float* [IMG_H];
-				}
-				for (int m = 0; m < IMG_H; m++)
-				{
-					if (g_idx_iteration_num == 0)
-					{
-						Train[j][c][m] = new float[IMG_W];
-					}
-					for (int n = 0; n < IMG_W; n++)
-					{
-						Train[j][c][m][n] = train_x[ii * batch_size_ + j][c][m][n];
-
-					}
-				}
-				if (g_idx_iteration_num == 0)
-				{
-					TrainLabel[j] = new float[2];
-				}
-				for (int l = 0; l < 2; l++)
-				{
-					TrainLabel[j][l] = train_label[ii * batch_size_ + j][l];
-				}
-			}
 		}
 
 
-		Forward(Train);
-		BackPropagation(Train, TrainLabel);
+		Forward(vec_train_batch_data.data());
+		BackPropagation(vec_train_batch_data.data(), vec_train_batch_label.data());
 		UpdateParas();
 
 
 	}
 	std::cout << "Finish train" << std::endl;
 
-	for (int i = 0; i < batch_size_; i++)
-	{
-		delete[]TrainLabel[i];
-		for (int c = 0; c < g_input_num_channel; c++)
-		{
-			for (int j = 0; j < IMG_H; j++)
-			{
-				delete[]Train[i][c][j];
-			}
-			delete[]Train[i][c];
-		}
-		delete[]Train[i];
-	}
-	delete[]Train;
-	delete[]TrainLabel;
 }
 
 void CPUCNN::Setup(int batch_size_)
@@ -196,15 +157,15 @@ void CPUCNN::SetupTest(int batch_size_)
 }
 
 
-void CPUCNN::BackPropagation(float**** x, float** y)
+void CPUCNN::BackPropagation(float* p_batch_data, float* p_batch_label)
 {
-	SetOutLayerErrors(x, y);
+	SetOutLayerErrors(p_batch_data, p_batch_label);
 	SetHiddenLayerErrors();
 }
 
-void CPUCNN::Forward(float**** x)
+void CPUCNN::Forward(float* p_batch_data)
 {
-	SetInLayerOutput(x);
+	SetInLayerOutput(p_batch_data);
 	VECCPUCNNLayers::iterator iter = vec_layers_.begin()+1;
 	//iter++;
 	for (iter; iter < vec_layers_.end(); iter++)
@@ -230,7 +191,7 @@ void CPUCNN::Forward(float**** x)
 	}
 }
 
-void CPUCNN::SetInLayerOutput(float**** x)
+void CPUCNN::SetInLayerOutput(float* p_batch_data)
 {
 	std::cout << "Execute CPUCNN::SetInLayerOutput()" << std::endl;
 
@@ -239,20 +200,7 @@ void CPUCNN::SetInLayerOutput(float**** x)
 	RectSize map_size = (*iter).GetMapSize();
 	size_t out_map_num = (*iter).GetOutMapNum();
 
-	if (IMG_H != map_size.x)
-	{
-		std::cout << "IMG_H != mapSize_.x" << std::endl;
-	}
-	for (int i = 0; i < batch_size_; i++)
-	{
-		for (int c = 0; c < out_map_num; c++)
-		{
-			int shift_idx_batch_map = i * out_map_num * map_size.x * map_size.y;
-			int shift_idx_out_map = c * map_size.x * map_size.y;
-			SetInLayerValue(((*iter).vec_output_maps_.data()+ shift_idx_batch_map+ shift_idx_out_map), x[i][c], IMG_H, IMG_W);
-			//memcpy();
-		}
-	}
+	copy(p_batch_data, (p_batch_data + (batch_size_ * out_map_num * map_size.x * map_size.y)), (*iter).vec_output_maps_.begin());
 }
 // for change the value in m_Layers
 void CPUCNN::SetConvOutput(CPUCNNLayer& layer, CPUCNNLayer& lastLayer)
@@ -574,12 +522,12 @@ void CPUCNN::SetOutLayerOutput(CPUCNNLayer& layer, CPUCNNLayer& lastLayer)
 }
 
 
-void CPUCNN::SetOutLayerErrors(float**** input_maps, float** target_labels)
+void CPUCNN::SetOutLayerErrors(float* p_input_maps, float* p_target_labels)
 {
 	VECCPUCNNLayers::iterator iter = vec_layers_.end();
 	iter--;
-	int mapNum = (*iter).GetOutMapNum();
-	float meanError = 0.0, maxError = 0.0;
+	size_t layer_outmap_num = (*iter).GetOutMapNum();
+	float mean_error = 0.0, max_error = 0.0;
 
 	//FILE* fy;
 	//fy = fopen("./outputdata/error.txt", "a");
@@ -589,11 +537,11 @@ void CPUCNN::SetOutLayerErrors(float**** input_maps, float** target_labels)
 
 	for (int idx_batch = 0; idx_batch < batch_size_; idx_batch++)
 	{
-		for (int idx_map = 0; idx_map < mapNum; idx_map++)
+		for (int idx_map = 0; idx_map < layer_outmap_num; idx_map++)
 		{
 			//float val_out_map = (*iter).outputmaps_[idx_batch][idx_map][0][0];
-			float val_target_label = target_labels[idx_batch][idx_map];
-			int shift_idx_layer_batch_map = idx_batch * mapNum * ((*iter).GetMapSize().x) * ((*iter).GetMapSize().y);
+			float val_target_label = p_target_labels[idx_batch * layer_outmap_num + idx_map];
+			int shift_idx_layer_batch_map = idx_batch * layer_outmap_num * ((*iter).GetMapSize().x) * ((*iter).GetMapSize().y);
 			int shift_idx_layer_out_map = idx_map * ((*iter).GetMapSize().x) * ((*iter).GetMapSize().y);
 			int shift_idx_layer_out_map_row = 0 * ((*iter).GetMapSize().y);
 			int idx_layer_out_map = shift_idx_layer_batch_map + shift_idx_layer_out_map + shift_idx_layer_out_map_row + 0;
@@ -603,32 +551,32 @@ void CPUCNN::SetOutLayerErrors(float**** input_maps, float** target_labels)
 			//printf("quadratic cost function for Logistic sigmoid");
 			//quadratic cost function for Logistic sigmoid
 			(*iter).SetError(idx_batch, idx_map, 0, 0, DERIV_ACTIVE_SIGMOID(val_out_map) * (val_target_label - val_out_map));
-			meanError = abs(val_target_label - val_out_map);
+			mean_error = abs(val_target_label - val_out_map);
 #elif(SELECT_ACTIVE_FUNCTION == 2)
 			//printf("Cross entropy cost function for Logistic sigmoid");
 			//Cross entropy cost function Logistic sigmoid
 			(*iter).SetError(idx_batch, idx_map, 0, 0, (val_target_label - val_out_map));
-			meanError = abs(val_target_label - val_out_map);
+			mean_error = abs(val_target_label - val_out_map);
 #elif(SELECT_ACTIVE_FUNCTION == 3)
 			//printf("Cross-entropy cost function for ReLU+Softmax");
 			//Cross entropy for softmax form
 			(*iter).SetError(idx_batch, idx_map, 0, 0, (val_target_label - val_out_map));
-			meanError = abs(val_target_label - val_out_map);
+			mean_error = abs(val_target_label - val_out_map);
 #endif
 
-			//fprintf(fy, "%f ", meanError);
-			//// 			meanError += abs(val_target_label-val_out_map);
-			//// 			if (abs(val_target_label-val_out_map)>maxError)
+			//fprintf(fy, "%f ", mean_error);
+			//// 			mean_error += abs(val_target_label-val_out_map);
+			//// 			if (abs(val_target_label-val_out_map)>max_error)
 			//// 			{
-			//// 				maxError = abs(val_target_label-val_out_map);
+			//// 				max_error = abs(val_target_label-val_out_map);
 			//// 			}
 		}
 		//fprintf(fy, "\n");
 	}
 	//fprintf(fy, "\n");
 	//fclose(fy);
-	//// 	std::cout<<"Mean error of each mini batch: "<<meanError<<std::endl;
-	//// 	std::cout<<"The max error of one output in mini batch: "<<maxError<<std::endl;
+	//// 	std::cout<<"Mean error of each mini batch: "<<mean_error<<std::endl;
+	//// 	std::cout<<"The max error of one output in mini batch: "<<max_error<<std::endl;
 }
 
 
@@ -1209,162 +1157,131 @@ void CPUCNN::LoadKernels(CPUCNNLayer& layer, CPUCNNLayer& lastLayer, char* str_F
 }
 
 
-void CPUCNN::Inference(float**** test_x, float** test_label, int number)
+void CPUCNN::Inference(DatasetLoadingParamPKG& r_dataset_param)
 {
 	std::cout << "Start Inference" << std::endl;
-	//char _posfilepath[256]="Traing_p_";
-	char _posfilepath[256] = "(Training)p_";
-	char _negfilepath[256] = "Training_n_";
-	char _imgfileextension[16] = ".bmp";
-	char _input_posfilename[512];
-	char _input_negfilename[512];
-	int num_charaters_pos1;
-	int num_charaters_neg1;
 
-	int totalfause = 0, fause1 = 0, fause2 = 0, predict, real;
-	int Num = number / batch_size_;
-	float**** Test;
+	size_t total_false = 0, false_1 = 0, false_2 = 0, predict, real;
+	size_t total_num_iter = r_dataset_param.total_num_images_ / batch_size_;
 
-	Test = new float*** [batch_size_];
+	float* p_inference_batch_data = nullptr;
+	float* p_inference_batch_label = nullptr;
+	std::vector<float> vec_inference_batch_data;
+	std::vector<float> vec_inference_batch_label;
+	vec_inference_batch_data.reserve(batch_size_ * r_dataset_param.channels_image_ * r_dataset_param.rows_image_ * r_dataset_param.cols_image_);
+	vec_inference_batch_data.resize(batch_size_ * r_dataset_param.channels_image_ * r_dataset_param.rows_image_ * r_dataset_param.cols_image_);
+	vec_inference_batch_label.reserve(batch_size_ * r_dataset_param.num_output_cls_);
+	vec_inference_batch_label.resize(batch_size_ * r_dataset_param.num_output_cls_);
 
-	FILE* fy_negfilename;
-	fy_negfilename = fopen("./outputdata/error_predict_neg_filename.txt", "w");
-	FILE* fy_posfilename;
-	fy_posfilename = fopen("./outputdata/error_predict_pos_filename.txt", "w");
-	for (int i = 0; i < Num; i++)
+	FILE* p_file_error_predict_neg = fopen("./outputdata/error_predict_neg_filename.txt", "w");
+	FILE* p_file_error_predict_pos = fopen("./outputdata/error_predict_pos_filename.txt", "w");
+	for (size_t idx_iteration = 0; idx_iteration < total_num_iter; idx_iteration++)
 	{
-		std::cout << "NO.of iteration(testing): " << i << std::endl;
-
-
-		for (int j = 0; j < batch_size_; j++)
+		std::cout << "NO.of iteration(testing): " << idx_iteration << std::endl;
+		size_t idx_inference_dataset_batch = idx_iteration % (r_dataset_param.total_num_images_ / batch_size_);
+		for (size_t idx_batch = 0; idx_batch < batch_size_; idx_batch++)
 		{
-			std::cout << "NO.of batch(testing): " << j << std::endl;
-			if (i == 0)
-			{
-				Test[j] = new float** [g_input_num_channel];
-			}
-			for (int c = 0; c < g_input_num_channel; c++)
-			{
+			std::cout << "NO.of batch(testing): " << idx_batch << std::endl;
+		
+			std::vector<float>::iterator shift_begin_iter_loaded_dataset_batch_data;
+			std::vector<float>::iterator shift_begin_iter_loaded_dataset_batch_label;
+			shift_begin_iter_loaded_dataset_batch_data = r_dataset_param.vec_images_.begin() + (idx_inference_dataset_batch * batch_size_ * r_dataset_param.channels_image_ * r_dataset_param.rows_image_ * r_dataset_param.cols_image_);
+			shift_begin_iter_loaded_dataset_batch_label = r_dataset_param.vec_labels_.begin() + (idx_inference_dataset_batch * batch_size_ * r_dataset_param.num_output_cls_);
+			vec_inference_batch_data.assign(shift_begin_iter_loaded_dataset_batch_data, (shift_begin_iter_loaded_dataset_batch_data + (batch_size_ * r_dataset_param.channels_image_ * r_dataset_param.rows_image_ * r_dataset_param.cols_image_)));
+			vec_inference_batch_label.assign(shift_begin_iter_loaded_dataset_batch_label, (shift_begin_iter_loaded_dataset_batch_label + (batch_size_ * r_dataset_param.num_output_cls_)));
 
-				if (i == 0)
-				{
-					Test[j][c] = new float* [IMG_H];
-				}
-
-				for (int m = 0; m < IMG_H; m++)
-				{
-					if (i == 0)
-					{
-						Test[j][c][m] = new float[IMG_W];
-					}
-					for (int n = 0; n < IMG_W; n++)
-					{
-						Test[j][c][m][n] = test_x[i * batch_size_ + j][c][m][n];
-					}
-				}
-			}
 		}
 
-		Forward(Test);
+		Forward(vec_inference_batch_data.data());
 		VECCPUCNNLayers::iterator iter = vec_layers_.end();
 		iter--;
-		for (int ii = 0; ii < batch_size_; ii++)
+		for (size_t idx_batch = 0; idx_batch < batch_size_; idx_batch++)
 		{
-			std::cout << ii << std::endl;
+			std::cout << idx_batch << std::endl;
 
-			int layer_outmap_num = (*iter).GetOutMapNum();
-			int layer_outmap_rows = (*iter).GetMapSize().x;
-			int layer_outmap_cols = (*iter).GetMapSize().y;
-			int shift_idx_layer_batch_map = ii * layer_outmap_num * layer_outmap_rows * layer_outmap_cols;		
+			size_t layer_outmap_num = (*iter).GetOutMapNum();
+			size_t layer_outmap_rows = (*iter).GetMapSize().x;
+			size_t layer_outmap_cols = (*iter).GetMapSize().y;
+			size_t shift_idx_layer_batch_map = idx_batch * layer_outmap_num * layer_outmap_rows * layer_outmap_cols;
 			float* p_layer_batchmap = (*iter).vec_output_maps_.data() + shift_idx_layer_batch_map;
 			predict = FindIndex(p_layer_batchmap, layer_outmap_num, layer_outmap_rows, layer_outmap_cols);
-			//predict = findIndex((*iter).outputmaps_[ii]);
-			real = FindIndex(test_label[i * batch_size_ + ii]);
+			//predict = findIndex((*iter).outputmaps_[idx_batch]);
+			//real = FindIndex(test_label[idx_iteration * batch_size_ + idx_batch]);
+			
+			float* p_batch_gt_label = vec_inference_batch_label.data() + (idx_batch * r_dataset_param.num_output_cls_);
+			real = FindIndex(p_batch_gt_label, r_dataset_param.num_output_cls_);
 
 
 			//predict For batch size=2
-			if (0 == ii) {
+			if (0 == idx_batch) {
 				if (predict != real)
 				{
-					fause1++;
-					num_charaters_neg1 = sprintf(_input_negfilename, "%s%d%s", _negfilepath, i, _imgfileextension);
+					false_1++;
+					//num_charaters_neg1 = sprintf(_input_negfilename, "%s%d%s", _negfilepath, idx_iteration, _imgfileextension);
 					//printf("error predict-number of charaters: %d, string: \"%s\"\n", num_charaters_neg1, _input_negfilename);
-					fprintf(fy_negfilename, "%s\n", _input_negfilename);
+					//fprintf(p_file_error_predict_neg, "%s\n", _input_negfilename);
 
 				}
 			}
-			else if (1 == ii) {
+			else if (1 == idx_batch) {
 				if (predict != real)
 				{
-					fause2++;
-					//num_charaters_pos1 = sprintf(_input_posfilename, "%s%d%s", _posfilepath, i, _imgfileextension);
-					num_charaters_pos1 = sprintf(_input_posfilename, "%s%d", _posfilepath, i);
+					false_2++;
+					//num_charaters_pos1 = sprintf(_input_posfilename, "%s%d%s", _posfilepath, idx_iteration, _imgfileextension);
+					//num_charaters_pos1 = sprintf(_input_posfilename, "%s%d", _posfilepath, idx_iteration);
 					//printf("error predict-number of charaters: %d, string: \"%s\"\n", num_charaters_pos1, _input_posfilename);
-					fprintf(fy_posfilename, "%s\n", _input_posfilename);
+					//fprintf(p_file_error_predict_pos, "%s\n", _input_posfilename);
 				}
 			}
 
 
 			/*predict for batchsize = 10
-			if(9 > ii){
+			if(9 > idx_batch){
 				if(predict != real)
 				{
-					fause1++;
-					num_charaters_neg1 = sprintf(_input_negfilename, "%s%d%s", _negfilepath, ((9*i)+ii), _imgfileextension);
+					false_1++;
+					num_charaters_neg1 = sprintf(_input_negfilename, "%s%d%s", _negfilepath, ((9*idx_iteration)+idx_batch), _imgfileextension);
 					//printf("error predict-number of charaters: %d, string: \"%s\"\n", num_charaters_neg1, _input_negfilename);
-					fprintf(fy_negfilename, "%s\n", _input_negfilename);
+					fprintf(p_file_error_predict_neg, "%s\n", _input_negfilename);
 
 				}
-			}else if(9 == ii){
+			}else if(9 == idx_batch){
 				if(predict != real)
 				{
-					fause2++;
-					//num_charaters_pos1 = sprintf(_input_posfilename, "%s%d%s", _posfilepath, i, _imgfileextension);
-					num_charaters_pos1 = sprintf(_input_posfilename, "%s%d", _posfilepath, i);
+					false_2++;
+					//num_charaters_pos1 = sprintf(_input_posfilename, "%s%d%s", _posfilepath, idx_iteration, _imgfileextension);
+					num_charaters_pos1 = sprintf(_input_posfilename, "%s%d", _posfilepath, idx_iteration);
 					//printf("error predict-number of charaters: %d, string: \"%s\"\n", num_charaters_pos1, _input_posfilename);
-					fprintf(fy_posfilename, "%s\n", _input_posfilename);
+					fprintf(p_file_error_predict_pos, "%s\n", _input_posfilename);
 				}
 			}
 			*/
 		}
 	}
 
-	totalfause = fause1 + fause2;
+	total_false = false_1 + false_2;
 
 	std::cout << "+++++++Finish Inference+++++++" << std::endl;
-	std::cout << "Error predict number of neg: " << fause1 << std::endl;
-	std::cout << "Error rate of neg: " << 1.0 * fause1 / number << std::endl;
-	std::cout << "Error predict number of pos: " << fause2 << std::endl;
-	std::cout << "Error rate of pos: " << 1.0 * fause2 / number << std::endl;
-	std::cout << "Error predict total number: " << totalfause << std::endl;
-	std::cout << "Total error rate: " << 1.0 * totalfause / number << std::endl << std::endl;
+	std::cout << "Error predict number of neg: " << false_1 << std::endl;
+	std::cout << "Error rate of neg: " << (float)false_1 / (float)r_dataset_param.num_neg_images_ << std::endl;
+	std::cout << "Error predict number of pos: " << false_2 << std::endl;
+	std::cout << "Error rate of pos: " << (float)false_2 / (float)r_dataset_param.num_pos_images_ << std::endl;
+	std::cout << "Error predict total number: " << total_false << std::endl;
+	std::cout << "Total error rate: " << (float)total_false / (float)r_dataset_param.total_num_images_ << std::endl << std::endl;
 
-	FILE* fy;
-	fy = fopen("./outputdata/fausePrun.txt", "a");
+	FILE* p_file_false_metrics;
+	p_file_false_metrics = fopen("./outputdata/false_metrics.txt", "a");
 	/*
-	if( (err=fopen_s(&fy, "fausePrun.txt", "a")) != 0 )
+	if( (err=fopen_s(&p_file_false_metrics, "fausePrun.txt", "a")) != 0 )
 		exit(1) ;
 	*/
 	g_idx_epoch++;
-	fprintf(fy, "epoch: %4d\n", g_idx_epoch);
-	fprintf(fy, "neg: %4d %8f\n", fause1, 1.0 * fause1 / number);
-	fprintf(fy, "pos: %4d %8f\n", fause2, 1.0 * fause2 / number);
-	fprintf(fy, "total: %4d %8f\n\n", totalfause, 1.0 * totalfause / number);
-	fclose(fy);
-	fclose(fy_posfilename);
-	fclose(fy_negfilename);
+	fprintf(p_file_false_metrics, "epoch: %4d\n", g_idx_epoch);
+	fprintf(p_file_false_metrics, "neg: %4d %8f\n", false_1, (float)false_1 / (float)r_dataset_param.num_neg_images_);
+	fprintf(p_file_false_metrics, "pos: %4d %8f\n", false_2, (float)false_2 / (float)r_dataset_param.num_pos_images_);
+	fprintf(p_file_false_metrics, "total: %4d %8f\n\n", total_false, (float)total_false / (float)r_dataset_param.total_num_images_);
+	fclose(p_file_false_metrics);
+	fclose(p_file_error_predict_pos);
+	fclose(p_file_error_predict_neg);
 
-	for (int i = 0; i < batch_size_; i++)
-	{
-		for (int c = 0; c < g_input_num_channel; c++)
-		{
-			for (int j = 0; j < IMG_H; j++)
-			{
-				delete[]Test[i][c][j];
-			}
-			delete[]Test[i][c];
-		}
-		delete[]Test[i];
-	}
-	delete[]Test;
 }
