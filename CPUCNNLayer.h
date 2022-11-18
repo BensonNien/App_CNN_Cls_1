@@ -39,7 +39,6 @@ void CalArrayPlus(float* x, float* y, int m, int n);
 void ScaleMatrix(float* p_matrix, RectSize scale, int matrix_rows, int matrix_cols, float* p_out_matrix);//sampling
 void Rot180(float* p_matrix, int m, int n, float* p_rot_matrix);
 void ConvNSampFull(float* p_matrix, float* p_kernel, int m, int n, int km, int kn, float* p_out_matrix, float* p_extend_matrix);// convn full mode
-//void ConvNFull(float** matrix, float** kernel_, int m, int n, int km, int kn, float** outmatrix, float** extendMatrix);// convn full mode
 void MatrixDrelu(float** matrix, int m, int n, float** M);// calculate derivation of ReLU function with matrix
 void MatrixDreluFChidden(float* matrix, int m, int n, float* M);// calculate derivation of ReLU function in FChiddenlayer with matrix
 void MatrixDreluConv(float* matrix, int m, int n, float* M);// calculate derivation of ReLU function in Convlayer with matrix
@@ -49,8 +48,6 @@ void Kronecker(float** matrix, RectSize scale, int m, int n, float** outmatrix);
 void CalKronecker(float* p_nextlayer_matrix, RectSize scale, int nextlayer_matrix_rows, int nextlayer_matrix_cols, float* p_out_matrix, int layer_out_matrix_rows, int layer_out_matrix_cols);
 void MatrixMultiply(float** matrix1, float** matrix2, int m, int n);//inner product of matrix 1 and matrix 2, result is matrix1
 void CalMatrixMultiply(float* matrix1, float* matrix2, int m, int n);
-//void Sum(float**** errors_, int j, int m, int n, int batchSize, float** outmatrix);
-//float CalSum(float** error, int m, int n);
 void CalErrorsSum(float* p_errors, int idx_outmap, int outmap_num, int outmap_rows, int outmap_cols, int batch_size, float* p_m);
 float CalErrorSum(float* error, int m, int n);
 void CalArrayDivide(float* matrix, int batchSize, int m, int n);// result is matrix;

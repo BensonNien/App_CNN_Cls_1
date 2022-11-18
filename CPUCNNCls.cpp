@@ -252,12 +252,9 @@ void CPUCNN::SetConvOutput(CPUCNNLayer& layer, CPUCNNLayer& lastLayer)
 			Sigmoid(sum, layer.bias_[i], x, y);//for sigmoid active fun.
 #elif(SELECT_ACTIVE_FUNCTION == 3)
 			//printf("ActiveRelu");
-			//ActiveRelu
-			//ActiveRelu(sum, layer.bias_[i], x, y);//for relu active fun.
 			ActiveRelu(vec_sum.data(), layer.vec_bias_.at(i), x, y);//for relu active fun.
 #endif
 
-			//SetValue(layer.outputmaps_[idx_batch][i], sum, x, y);
 			int shift_idx_layer_batch_map = idx_batch * mapNum * x * y;
 			int shift_idx_layer_out_map = i * x * y;
 			float* p_layer_out_map = layer.vec_output_maps_.data() + shift_idx_layer_batch_map + shift_idx_layer_out_map;
@@ -288,11 +285,6 @@ void CPUCNN::SetSampOutput(CPUCNNLayer& layer, CPUCNNLayer& lastLayer)
 	{
 		for (int i = 0; i < lastMapNum; i++)
 		{
-			//lastMap = lastLayer.outputmaps_[idx_batch][i];
-			//ScaleMatrix(lastMap, scale_size, lastlayer_map_x, lastlayer_map_y, vec_samp_matrix);
-
-			//SetValue(layer.outputmaps_[idx_batch][i], vec_samp_matrix, x, y);
-			
 			shift_idx_lastlayer_batch_map = idx_batch * lastMapNum * lastlayer_map_x * lastlayer_map_y;
 			shift_idx_lastlayer_out_map = i * lastlayer_map_x * lastlayer_map_y;
 			p_lastlayer_map = lastLayer.vec_output_maps_.data() + shift_idx_lastlayer_batch_map + shift_idx_lastlayer_out_map;			
@@ -330,8 +322,7 @@ void CPUCNN::SetFCHLayerOutput(CPUCNNLayer& layer, CPUCNNLayer& lastLayer)
 				int shift_idx_lastlayer_batch_map = idx_batch * lastMapNum * lastlayer_map_x * lastlayer_map_y;
 				int shift_idx_lastlayer_out_map = j * lastlayer_map_x * lastlayer_map_y;
 				float* p_lastlayer_map = lastLayer.vec_output_maps_.data() + shift_idx_lastlayer_batch_map + shift_idx_lastlayer_out_map;
-				//float** lastMap;
-				//lastMap = lastLayer.outputmaps_[idx_batch][j];				
+			
 				int shift_idx_layer_front_kernel = j * mapNum * layer_kernel_x * layer_kernel_y;
 				int shift_idx_layer_out_kernel = i * layer_kernel_x * layer_kernel_y;
 				float* p_layer_kernel = layer.vec_kernel_.data() + shift_idx_layer_front_kernel + shift_idx_layer_out_kernel;
@@ -355,8 +346,6 @@ void CPUCNN::SetFCHLayerOutput(CPUCNNLayer& layer, CPUCNNLayer& lastLayer)
 			Sigmoid(sum, layer.bias_[i], x, y);//for sigmoid active fun.
 #elif(SELECT_ACTIVE_FUNCTION == 3)
 			//printf("ActiveRelu");
-			//ActiveRelu
-			//ActiveRelu(sum, layer.bias_[i], x, y);//for relu active fun.
 			ActiveRelu(vec_sum.data(), layer.vec_bias_.at(i), x, y);//for relu active fun.
 #endif
 
@@ -367,17 +356,6 @@ void CPUCNN::SetFCHLayerOutput(CPUCNNLayer& layer, CPUCNNLayer& lastLayer)
 			memcpy(p_layer_out_map, vec_sum.data(), (x * y * sizeof(float)));
 
 		}
-
-		/*for (int i = 0; i < mapNum; i++)
-		{
-			for (int ii = 0; ii < x; ii++)
-			{
-				for (int jj = 0; jj < y; jj++)
-				{
-					std::cout << "FullyConnectedHiddenLayer's active fun. actual output(layer.outputmaps_[" << idx_batch << "][" << i << "][" << ii << "][" << jj << "]): " << layer.outputmaps_[idx_batch][i][ii][jj] << std::endl;
-				}
-			}
-		}*/
 
 	}
 }
@@ -449,8 +427,7 @@ void CPUCNN::SetOutLayerOutput(CPUCNNLayer& layer, CPUCNNLayer& lastLayer)
 				int shift_idx_lastlayer_batch_map = idx_batch * lastMapNum * lastlayer_map_x * lastlayer_map_y;
 				int shift_idx_lastlayer_out_map = j * lastlayer_map_x * lastlayer_map_y;
 				float* p_lastlayer_map = lastLayer.vec_output_maps_.data() + shift_idx_lastlayer_batch_map + shift_idx_lastlayer_out_map;
-				//float** lastMap;
-				//lastMap = lastLayer.outputmaps_[idx_batch][j];				
+			
 				int shift_idx_layer_front_kernel = j * mapNum * layer_kernel_x * layer_kernel_y;
 				int shift_idx_layer_out_kernel = i * layer_kernel_x * layer_kernel_y;
 				float* p_layer_kernel = layer.vec_kernel_.data() + shift_idx_layer_front_kernel + shift_idx_layer_out_kernel;
@@ -468,11 +445,8 @@ void CPUCNN::SetOutLayerOutput(CPUCNNLayer& layer, CPUCNNLayer& lastLayer)
 				}
 			}
 
-			//CalExpone(sum, layer.bias_[i], x, y);
 			CalExpone(vec_sum.data(), layer.vec_bias_.at(i), x, y);
 
-
-			//SetValue(layer.outputmaps_[idx_batch][i], sum, x, y);
 			int shift_idx_layer_batch_map = idx_batch * mapNum * x * y;
 			int shift_idx_layer_out_map = i * x * y;
 			float* p_layer_out_map = layer.vec_output_maps_.data() + shift_idx_layer_batch_map + shift_idx_layer_out_map;
@@ -486,7 +460,6 @@ void CPUCNN::SetOutLayerOutput(CPUCNNLayer& layer, CPUCNNLayer& lastLayer)
 			{
 				for (int jj = 0; jj < y; jj++)
 				{
-					//sum_Expone[idx_batch] = sum_Expone[idx_batch] + layer.outputmaps_[idx_batch][i][ii][jj];
 					int shift_idx_layer_batch_map = idx_batch * mapNum * x * y;
 					int shift_idx_layer_out_map = i * x * y;
 					int shift_idx_layer_out_map_row = ii * y;
@@ -503,8 +476,6 @@ void CPUCNN::SetOutLayerOutput(CPUCNNLayer& layer, CPUCNNLayer& lastLayer)
 				for (int jj = 0; jj < y; jj++)
 				{
 
-					//layer.outputmaps_[idx_batch][i][ii][jj] = layer.outputmaps_[idx_batch][i][ii][jj] / sum_Expone[idx_batch];
-					
 					int shift_idx_layer_batch_map = idx_batch * mapNum * x * y;
 					int shift_idx_layer_out_map = i * x * y;
 					int shift_idx_layer_out_map_row = ii * y;
@@ -589,12 +560,6 @@ void CPUCNN::SetFCHiddenLayerErrors(CPUCNNLayer& Lastlayer, CPUCNNLayer& layer, 
 	int nextlayer_outmap_num = nextLayer.GetOutMapNum();
 	int nextlayer_outmap_rows = nextLayer.GetMapSize().x;
 	int nextlayer_outmap_cols = nextLayer.GetMapSize().y;
-	
-	//float** map;	
-	//float** thisError;
-	//float** nextError;
-	//float** outMatrix, ** kroneckerMatrix;
-	//RectSize layer_scale_size;
 
 	float* p_layer_outmap = nullptr;
 	float* p_layer_error = nullptr;
@@ -607,53 +572,10 @@ void CPUCNN::SetFCHiddenLayerErrors(CPUCNNLayer& Lastlayer, CPUCNNLayer& layer, 
 	vec_layer_outkroneckermatrix.resize(layer_outmap_rows * layer_outmap_cols);
 	RectSize layer_scale_size = layer.GetScaleSize();
 
-	//for (int idx_batch = 0; idx_batch < batch_size_; idx_batch++)
-	//{
-	//	for (int idx_layer_outmap = 0; idx_layer_outmap < layer_outmap_num; idx_layer_outmap++)
-	//	{
-	//		p_layer_error = layer.GetError(idx_batch, idx_layer_outmap);
-	//		/*for (int ii = 0; ii < layer_outmap_rows; ii++) {
-	//			for (int jj = 0; jj < layer_outmap_cols; jj++) {
-	//				printf("p_layer_error[%d][%d][%d][%d]: %f\n", idx_batch, idx_layer_outmap, ii, jj, p_layer_error[ii][jj]);
-	//			}
-	//		}*/
-	//	}
-	//}
-
-	//for (int idx_batch = 0; idx_batch < batch_size_; idx_batch++)
-	//{
-	//	for (int idx_nextlayer_outmap = 0; idx_nextlayer_outmap < nextlayer_outmap_num; idx_nextlayer_outmap++)
-	//	{
-	//		p_layer_error = nextLayer.GetError(idx_batch, idx_nextlayer_outmap);
-	//		//for (int ii = 0; ii < nextlayer_outmap_rows; ii++) {
-	//		//	for (int jj = 0; jj < nextlayer_outmap_cols; jj++) {
-	//		//		printf("p_layer_error[%d][%d][%d][%d]: %f\n", idx_batch, idx_nextlayer_outmap, ii, jj, p_layer_error[ii][jj]);
-	//		//	}
-	//		//}
-	//	}
-	//}
-	//printf("================================================================================\n");
-
 	int nextlayer_kernel_rows = nextLayer.GetKernelSize().x;
 	int nextlayer_kernel_cols = nextLayer.GetKernelSize().y;
-	//float** nextkernel;
-	float* p_nextlayer_kernel = nullptr;
 
-	//for (int i = 0; i < layer_outmap_num; i++)
-	//{
-	//	for (int j = 0; j < nextlayer_outmap_num; j++)
-	//	{
-	//		p_nextlayer_kernel = nextLayer.GetKernel(i, j);
-	//		//for (int ii = 0; ii < nextlayer_kernel_rows; ii++)
-	//		//{
-	//		//	for (int jj = 0; jj < nextlayer_kernel_cols; jj++)
-	//		//	{
-	//		//		printf("p_nextlayer_kernel[%d][%d][%d][%d]: %f\n", i, j, ii, jj, p_nextlayer_kernel[ii][jj]);
-	//		//	}
-	//		//}
-	//	}
-	//}
-	//printf("================================================================================\n");
+	float* p_nextlayer_kernel = nullptr;
 
 	vector<float> vec_derivative_active_fun;
 	vec_derivative_active_fun.reserve(batch_size_ * layer_outmap_num);
@@ -663,7 +585,6 @@ void CPUCNN::SetFCHiddenLayerErrors(CPUCNNLayer& Lastlayer, CPUCNNLayer& layer, 
 	{
 		for (int idx_layer_outmap = 0; idx_layer_outmap < layer_outmap_num; idx_layer_outmap++)
 		{
-			//outMatrix = layer.outputmaps_[idx_batch][idx_layer_outmap];
 			int shift_idx_layer_batch_map = idx_batch * layer_outmap_num * layer_outmap_rows * layer_outmap_cols;
 			int shift_idx_layer_out_map = idx_layer_outmap * layer_outmap_rows * layer_outmap_cols;
 			p_layer_outmap = layer.vec_output_maps_.data() + shift_idx_layer_batch_map + shift_idx_layer_out_map;
@@ -677,8 +598,6 @@ void CPUCNN::SetFCHiddenLayerErrors(CPUCNNLayer& Lastlayer, CPUCNNLayer& layer, 
 			matrixDsigmoidFChidden(p_layer_outmap, layer_outmap_rows, layer_outmap_cols, &(derivativeOfActiveFun[idx_batch][idx_layer_outmap]));//for sigmoid active fun. 20171201
 #elif(SELECT_ACTIVE_FUNCTION == 3)
 			//printf("derivative of ReLu");
-			//derivative of ReLu
-			//MatrixDreluFChidden(p_layer_outmap, layer_outmap_rows, layer_outmap_cols, &(derivativeOfActiveFun[idx_batch][idx_layer_outmap]));//for relu active fun.
 			float* p_derivative_active_fun = vec_derivative_active_fun.data() + (idx_batch * layer_outmap_num + idx_layer_outmap);
 			MatrixDreluFChidden(p_layer_outmap, layer_outmap_rows, layer_outmap_cols, p_derivative_active_fun);//for relu active fun.
 #endif
@@ -693,8 +612,6 @@ void CPUCNN::SetFCHiddenLayerErrors(CPUCNNLayer& Lastlayer, CPUCNNLayer& layer, 
 		{
 			p_layer_error = layer.GetError(idx_batch, idx_layer_outmap);
 			p_layer_error[0 * layer_outmap_num + 0] = vec_derivative_active_fun.at(idx_batch * layer_outmap_num + idx_layer_outmap);
-
-			//printf("p_layer_error[%d][%d][0][0]: %f\n", idx_batch, idx_layer_outmap, p_layer_error[0][0]);
 
 		}
 	}
@@ -711,7 +628,6 @@ void CPUCNN::SetFCHiddenLayerErrors(CPUCNNLayer& Lastlayer, CPUCNNLayer& layer, 
 				p_layer_error = nextLayer.GetError(idx_batch, idx_nextlayer_outmap);
 				p_nextlayer_kernel = nextLayer.GetKernel(idx_layer_outmap, idx_nextlayer_outmap);
 
-				//sumOflocalgradient[idx_batch][idx_layer_outmap] += p_layer_error[0][0] * p_nextlayer_kernel[0][0];
 				vec_sum_local_gradient[idx_batch * layer_outmap_num + idx_layer_outmap] += p_layer_error[0 * nextlayer_outmap_num + 0] * p_nextlayer_kernel[0 * nextlayer_kernel_cols + 0];
 
 			}
@@ -775,10 +691,6 @@ void CPUCNN::SetSampErrors(CPUCNNLayer& layer, CPUCNNLayer& nextLayer)
 	int nextlayer_outmap_cols = nextLayer.GetMapSize().y;
 	int nextlayer_kernel_rows = nextLayer.GetKernelSize().x;
 	int nextlayer_kernel_cols = nextLayer.GetKernelSize().y;
-	
-	//float** nextError;
-	//float** kernel_;
-	//float** sum, ** rotMatrix, ** sumNow;
 
 	float* p_nextlayer_error = nullptr;
 	float* p_nextlayer_kernel = nullptr;
@@ -787,19 +699,6 @@ void CPUCNN::SetSampErrors(CPUCNNLayer& layer, CPUCNNLayer& nextLayer)
 	vector<float> vec_rot_matrix(nextlayer_kernel_rows * nextlayer_kernel_cols, 0.0);
 	vector<float> vec_nextlayer_extend_matrix((nextlayer_outmap_rows+2*(nextlayer_kernel_rows-1)) * (nextlayer_outmap_cols+2*(nextlayer_kernel_cols-1)), 0.0);
 
-	//initialize
-	//float** extendMatrix;
-	//int m = nextlayer_outmap_rows, n = nextlayer_outmap_cols, km = nextlayer_kernel_rows, kn = nextlayer_kernel_cols;
-	//extendMatrix = new float* [m + 2 * (km - 1)];
-	//for (int k = 0; k < m + 2 * (km - 1); k++)
-	//{
-	//	extendMatrix[k] = new float[n + 2 * (kn - 1)];
-	//	for (int a = 0; a < n + 2 * (kn - 1); a++)
-	//	{
-	//		extendMatrix[k][a] = 0.0;
-	//	}
-	//}
-	
 	//calculate
 	for (int idx_batch = 0; idx_batch < batch_size_; idx_batch++)
 	{
@@ -838,10 +737,6 @@ void CPUCNN::SetConvErrors(CPUCNNLayer& layer, CPUCNNLayer& nextLayer)
 	int layer_outmap_cols = layer.GetMapSize().y;
 	int nextlayer_outmap_rows = nextLayer.GetMapSize().x;
 	int nextlayer_outmap_cols = nextLayer.GetMapSize().y;
-	//float** nextError;
-	//float** map;
-	//float** outMatrix, ** kroneckerMatrix;
-	//RectSize scale;
 
 	float* p_nextlayer_error = nullptr;
 	float* p_layer_outmap = nullptr;
@@ -859,7 +754,6 @@ void CPUCNN::SetConvErrors(CPUCNNLayer& layer, CPUCNNLayer& nextLayer)
 		{
 			layer_scale_size = nextLayer.GetScaleSize();
 			p_nextlayer_error = nextLayer.GetError(idx_batch, idx_layer_outmap);
-			//p_layer_outmap = layer.outputmaps_[idx_batch][idx_layer_outmap];
 			int shift_idx_layer_batch_map = idx_batch * layer_outmap_num * layer_outmap_rows * layer_outmap_cols;
 			int shift_idx_layer_out_map = idx_layer_outmap * layer_outmap_rows * layer_outmap_cols;
 			p_layer_outmap = layer.vec_output_maps_.data() + shift_idx_layer_batch_map + shift_idx_layer_out_map;
@@ -925,8 +819,6 @@ void CPUCNN::UpdateParas()
 
 void CPUCNN::UpdateBias(CPUCNNLayer& layer, char* str_File_Bias, float eta)
 {
-	//float**** errors = layer.errors_;
-	//float** error;
 	int layer_outmap_num = layer.GetOutMapNum();
 	int layer_outmap_rows = layer.GetMapSize().x;
 	int layer_outmap_cols = layer.GetMapSize().y;
@@ -976,28 +868,20 @@ void CPUCNN::UpdateKernels(CPUCNNLayer& layer, CPUCNNLayer& lastLayer, char* str
 	float* p_layer_laststep_delta_kernel = nullptr;
 	float* p_layer_kernel = nullptr;
 
-	//float** deltakernel1, ** deltakernel2, ** deltaNow;
-
 	for (int idx_layer_outmap = 0; idx_layer_outmap < layer_outmap_num; idx_layer_outmap++)
 	{
 		for (int idx_lastlayer_outmap = 0; idx_lastlayer_outmap < lastlayer_outmap_num; idx_lastlayer_outmap++)
 		{
 			for (int idx_batch = 0; idx_batch < batch_size_; idx_batch++)
 			{
-				//float** error = layer.errors_[idx_batch][idx_layer_outmap];
 				p_layer_error = layer.GetError(idx_batch, idx_layer_outmap);
 				if (idx_batch == 0) {
-					//ConvNValid(lastLayer.outputmaps_[idx_batch][idx_lastlayer_outmap], error, lastlayer_outmap_rows, lastlayer_outmap_cols, layer_outmap_rows, layer_outmap_cols, vec_delta_kernel_1);
-					
 					int shift_idx_lastlayer_batch_map = idx_batch * lastlayer_outmap_num * lastlayer_outmap_rows * lastlayer_outmap_cols;
 					int shift_idx_lastlayer_out_map = idx_lastlayer_outmap * lastlayer_outmap_rows * lastlayer_outmap_cols;
 					p_lastlayer_outmap = lastLayer.vec_output_maps_.data() + shift_idx_lastlayer_batch_map + shift_idx_lastlayer_out_map;
 					ConvNValid(p_lastlayer_outmap, p_layer_error, lastlayer_outmap_rows, lastlayer_outmap_cols, layer_outmap_rows, layer_outmap_cols, vec_delta_kernel_1.data());
 				}
 				else {
-					//ConvNValid(lastLayer.outputmaps_[idx_batch][idx_lastlayer_outmap], error, lastlayer_outmap_rows, lastlayer_outmap_cols, layer_outmap_rows, layer_outmap_cols, vec_delta_now);
-					//CalArrayPlus(vec_delta_now, vec_delta_kernel_1, layer_kernel_rows, layer_kernel_cols);
-
 					int shift_idx_lastlayer_batch_map = idx_batch * lastlayer_outmap_num * lastlayer_outmap_rows * lastlayer_outmap_cols;
 					int shift_idx_lastlayer_out_map = idx_lastlayer_outmap * lastlayer_outmap_rows * lastlayer_outmap_cols;
 					p_lastlayer_outmap = lastLayer.vec_output_maps_.data() + shift_idx_lastlayer_batch_map + shift_idx_lastlayer_out_map;
@@ -1005,7 +889,6 @@ void CPUCNN::UpdateKernels(CPUCNNLayer& layer, CPUCNNLayer& lastLayer, char* str
 					CalConvArrayPlus(vec_delta_now.data(), vec_delta_kernel_1.data(), layer_kernel_rows, layer_kernel_cols);
 				}
 			}
-			//SetValue(vec_delta_kernel_2, layer.laststepdeltakernel_[idx_lastlayer_outmap][idx_layer_outmap], layer.GetKernelSize().x, layer.GetKernelSize().y);//for adding momentum
 			int shift_idx_layer_kernel_lastlayer = idx_lastlayer_outmap * layer_outmap_num * layer_kernel_rows * layer_kernel_cols;
 			int shift_idx_layer_kernel_layer = idx_layer_outmap * layer_kernel_rows * layer_kernel_cols;
 			p_layer_laststep_delta_kernel = layer.vec_laststep_delta_kernel_.data() + shift_idx_layer_kernel_lastlayer + shift_idx_layer_kernel_layer;
@@ -1015,7 +898,6 @@ void CPUCNN::UpdateKernels(CPUCNNLayer& layer, CPUCNNLayer& lastLayer, char* str
 			CalArrayPlus(vec_delta_kernel_2.data(), p_layer_kernel, layer_kernel_rows, layer_kernel_cols);//for adding momentum
 			CalArrayDivide(vec_delta_kernel_1.data(), batch_size_, layer_kernel_rows, layer_kernel_cols);
 			CalArrayMultiply(vec_delta_kernel_1.data(), eta, layer_kernel_rows, layer_kernel_cols);
-			//SetValue(layer.laststepdeltakernel_[idx_lastlayer_outmap][idx_layer_outmap], vec_delta_kernel_1, layer.GetKernelSize().layer_kernel_rows, layer.GetKernelSize().layer_kernel_cols);//for adding momentum
 			SetKernelValue(p_layer_laststep_delta_kernel, vec_delta_kernel_1.data(), layer_kernel_rows, layer_kernel_cols);//for adding momentum
 			CalArrayPlus(vec_delta_kernel_1.data(), p_layer_kernel, layer_kernel_rows, layer_kernel_cols);
 
@@ -1205,9 +1087,7 @@ void CPUCNN::Inference(DatasetLoadingParamPKG& r_dataset_param)
 			size_t shift_idx_layer_batch_map = idx_batch * layer_outmap_num * layer_outmap_rows * layer_outmap_cols;
 			float* p_layer_batchmap = (*iter).vec_output_maps_.data() + shift_idx_layer_batch_map;
 			predict = FindIndex(p_layer_batchmap, layer_outmap_num, layer_outmap_rows, layer_outmap_cols);
-			//predict = findIndex((*iter).outputmaps_[idx_batch]);
-			//real = FindIndex(test_label[idx_iteration * batch_size_ + idx_batch]);
-			
+
 			float* p_batch_gt_label = vec_inference_batch_label.data() + (idx_batch * r_dataset_param.num_output_cls_);
 			real = FindIndex(p_batch_gt_label, r_dataset_param.num_output_cls_);
 

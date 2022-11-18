@@ -50,7 +50,6 @@ void ConvNValid(float* p_matrix, float* p_kernel, int map_size_row, int map_size
 			{
 				for (int kj = 0; kj < kernel_size_col; kj++)
 				{
-					//sum += p_matrix[i + ki][j + kj] * p_kernel[ki][kj];
 					sum += p_matrix[((i + ki) * map_size_col) + (j + kj)] * p_kernel[(ki * kernel_size_col) + kj];
 				}
 			}
@@ -196,9 +195,6 @@ void Rot180(float* p_matrix, int m, int n, float* p_rot_matrix)
 	{
 		for (int i = 0; i < m / 2; i++)
 		{
-			/*float tmp = p_rot_matrix[i][j];
-			p_rot_matrix[i][j] = p_rot_matrix[m - 1 - i][j];
-			p_rot_matrix[m - 1 - i][j] = tmp;*/
 			std::swap(p_rot_matrix[i * n + j], p_rot_matrix[(m - 1 - i)*n+j]);
 		}
 	}
@@ -209,7 +205,6 @@ void ConvNSampFull(float* p_matrix, float* p_kernel, int m, int n, int km, int k
 
 	for (int i = 0; i < m; i++) {
 		for (int j = 0; j < n; j++) {
-			//p_extend_matrix[i + km - 1][j + kn - 1] = p_matrix[i][j];
 			p_extend_matrix[((i + km - 1)*n)+(j + kn - 1)] = p_matrix[i*n+j];
 		}	
 	}
@@ -217,18 +212,6 @@ void ConvNSampFull(float* p_matrix, float* p_kernel, int m, int n, int km, int k
 	ConvNValid(p_extend_matrix, p_kernel, (m + 2 * (km - 1)), (n + 2 * (kn - 1)), km, kn, p_out_matrix);
 
 }
-
-//void ConvNFull(float** matrix, float** kernel_, int m, int n, int km, int kn, float** outmatrix, float** extendMatrix)
-//{
-//
-//	for (int i = 0; i < m; i++) {
-//		for (int j = 0; j < n; j++)
-//			extendMatrix[i + km - 1][j + kn - 1] = matrix[i][j];
-//	}
-//
-//	ConvNValid(extendMatrix, kernel_, m + 2 * (km - 1), n + 2 * (kn - 1), km, kn, outmatrix);
-//
-//}
 
 void MatrixDrelu(float** matrix, int m, int n, float** M)
 {
@@ -358,30 +341,6 @@ void CalMatrixMultiply(float* matrix1, float* matrix2, int m, int n)
 	}
 }
 
-//void Sum(float**** errors_, int j, int m, int n, int batchSize, float** M)
-//{
-//	for (int mi = 0; mi < m; mi++) {
-//		for (int nj = 0; nj < n; nj++) {
-//			float sum = 0;
-//			for (int i = 0; i < batchSize; i++) {
-//				sum += errors_[i][j][mi][nj];
-//			}
-//			M[mi][nj] = sum;
-//		}
-//	}
-//}
-
-//float Sum(float** error, int m, int n)
-//{
-//	float sum = 0.0;
-//	for (int i = 0; i < m; i++) {
-//		for (int j = 0; j < n; j++) {
-//			sum += error[i][j];
-//		}
-//	}
-//	return sum;
-//}
-
 void CalErrorsSum(float* p_errors, int idx_outmap, int outmap_num, int outmap_rows, int outmap_cols, int batch_size, float* p_m)
 {
 	float sum = 0.0;
@@ -395,7 +354,7 @@ void CalErrorsSum(float* p_errors, int idx_outmap, int outmap_num, int outmap_ro
 				shift_idx_error_batch_map = i * outmap_num * outmap_rows * outmap_cols;
 				shift_idx_error_out_map = idx_outmap * outmap_rows * outmap_cols;
 				idx_error_out_map = shift_idx_error_batch_map + shift_idx_error_out_map + (mi * outmap_cols) + nj;
-				//sum += p_errors[i][j][mi][nj];
+
 				sum += p_errors[idx_error_out_map];
 			}
 			p_m[mi * outmap_cols + nj] = sum;
@@ -573,8 +532,6 @@ CPUCNNLayer CPUCNNLayer::CreateFullyConnectedHiddenLayer(int input_element_num, 
 CPUCNNLayer CPUCNNLayer::CreateOutputLayer(int class_num)
 {
 	CPUCNNLayer layer;
-	//layer.in_element_num_ = input_element_num;
-	//layer.out_element_num_ = output_element_num;
 	layer.class_num_ = class_num;
 	layer.layer_type_ = 'O';
 	layer.map_size_ = RectSize(1, 1);

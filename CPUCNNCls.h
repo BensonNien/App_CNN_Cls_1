@@ -71,17 +71,13 @@ public:
 	void SetBatchsize(int batchsize) {
 		this->batch_size_ = batchsize;
 	}
-	//void Train(float**** train_x, float** train_label, int numofimage);
-	//void Inference(float**** test_x, float** test_label, int numOfImage);
 	void Train(DatasetLoadingParamPKG& r_dataset_param);
 	void Inference(DatasetLoadingParamPKG& r_dataset_param);
 	void Setup(int batch_size);// builder CPUCNN with batch_size_ and initialize some parameters of each layer
 	void SetupTest(int batch_size);
 
 	//back-propagation
-	//void BackPropagation(float**** x, float** y);
 	void BackPropagation(float* p_batch_data, float* p_batch_label);
-	//void SetOutLayerErrors(float**** input_maps, float** target_labels);
 	void SetOutLayerErrors(float* p_input_maps, float* p_target_labels);
 	void SetHiddenLayerErrors();
 	void SetFCHiddenLayerErrors(CPUCNNLayer& Lastlayer, CPUCNNLayer& layer, CPUCNNLayer& nextLayer);
@@ -93,7 +89,6 @@ public:
 	void UpdateParas();
 
 	//forward
-	//void Forward(float**** x);
 	void Forward(float* p_batch_data);
 	void SetInLayerOutput(float* p_batch_data);
 	void SetConvOutput(CPUCNNLayer& layer, CPUCNNLayer& lastLayer);
